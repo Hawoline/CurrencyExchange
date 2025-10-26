@@ -9,13 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrenciesDao implements Dao<CurrencyEntity> {
-
+    private ConnectionManager connectionManager = new ConnectionManager();
 
     @Override
     public List<CurrencyEntity> getAll() {
         List<CurrencyEntity> currencies = new ArrayList<>();
-
-        ConnectionManager connectionManager = new ConnectionManager();
         try (Statement statement = connectionManager.getConnection().createStatement()) {
             String result = "SELECT * FROM Currencies";
             ResultSet resultSet = statement.executeQuery(result);
@@ -36,7 +34,32 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
 
     @Override
     public void save(CurrencyEntity currencyEntity) {
+        Connection connection = connectionManager.getConnection();
+        String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
+                "'"+ currencyEntity.getCode() + "', " +
+                "'"+ currencyEntity.getName() + "', " +
+                "'"+ currencyEntity.getSign() + "');";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public boolean exists(CurrencyEntity currencyEntity) {
+        Connection connection = connectionManager.getConnection();
+        try {
+            String sql = "SELECT EXISTS(SELECT 1 FROM Currencies WHERE code = ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, currencyEntity.getCode());
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                return rs.getInt(1) == 1;
+            }
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     @Override

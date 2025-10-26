@@ -6,7 +6,11 @@ public class CurrencyEntity {
     private String code;
     private String sign;
     public CurrencyEntity(int id, String name, String code, String sign) {
+        this(name, code, sign);
         this.id = id;
+    }
+
+    public CurrencyEntity(String name, String code, String sign) {
         this.name = name;
         this.code = code;
         this.sign = sign;

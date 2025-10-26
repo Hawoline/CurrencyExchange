@@ -5,6 +5,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import ru.hawoline.currencyexchange.data.CurrenciesDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.Currency;
@@ -17,12 +19,12 @@ import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class GetCurrenciesServlet extends HttpServlet {
+    private Dao<CurrencyEntity> dao = new CurrenciesDao();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
-        Dao<CurrencyEntity> dao = new CurrenciesDao();
         List<CurrencyEntity> currencies = dao.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
@@ -38,10 +40,22 @@ public class GetCurrenciesServlet extends HttpServlet {
         out.close();
     }
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        if ("POST".equalsIgnoreCase(request.getMethod())) {
-            String test = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            int a = 0;
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String currency = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        JSONObject currencyJsonObject = new JSONObject(currency);
+        CurrencyEntity currencyEntity = new CurrencyEntity(
+                currencyJsonObject.getString("name"),
+                currencyJsonObject.getString("code"),
+                currencyJsonObject.getString("sign")
+        );
+        if (currencyEntity.getSign().isEmpty() || currencyEntity.getName().isEmpty()  || currencyEntity.getCode().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
+        if (dao.exists(currencyEntity)) {
+            response.sendError(HttpServletResponse.SC_CONFLICT);
+            return;
+        }
+        dao.save(currencyEntity);
     }
 }
