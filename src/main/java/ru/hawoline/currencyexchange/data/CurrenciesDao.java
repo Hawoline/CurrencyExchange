@@ -8,13 +8,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrenciesDao implements Dao<CurrencyEntity> {
-    private ConnectionManager connectionManager = new ConnectionManager();
+public class CurrenciesDao implements Dao<CurrencyEntity, String> {
+    private Connection connection = new ConnectionManager().getConnection();
 
     @Override
     public List<CurrencyEntity> getAll() {
         List<CurrencyEntity> currencies = new ArrayList<>();
-        try (Statement statement = connectionManager.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM Currencies";
             ResultSet resultSet = statement.executeQuery(result);
             while (resultSet.next()) {
@@ -34,7 +34,6 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
 
     @Override
     public void save(CurrencyEntity currencyEntity) {
-        Connection connection = connectionManager.getConnection();
         String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
                 "'"+ currencyEntity.getCode() + "', " +
                 "'"+ currencyEntity.getName() + "', " +
@@ -48,12 +47,26 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
     }
 
     @Override
-    public boolean exists(CurrencyEntity currencyEntity) {
-        Connection connection = connectionManager.getConnection();
+    public CurrencyEntity get(String code) {
+        String sql = "SELECT * FROM Currencies WHERE Code = '"+ code +"';";
+        try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            return new CurrencyEntity(
+                    resultSet.getInt("id"),
+                    resultSet.getString("FullName"),
+                    resultSet.getString("code"),
+                    resultSet.getString("sign")
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean exists(String code) {
         try {
             String sql = "SELECT EXISTS(SELECT 1 FROM Currencies WHERE code = ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, currencyEntity.getCode());
+            preparedStatement.setString(1, code);
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 return rs.getInt(1) == 1;
             }

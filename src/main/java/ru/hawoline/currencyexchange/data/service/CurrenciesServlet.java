@@ -5,11 +5,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.hawoline.currencyexchange.data.CurrenciesDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
-import ru.hawoline.currencyexchange.domain.Currency;
 import ru.hawoline.currencyexchange.domain.Dao;
 
 import java.io.IOException;
@@ -18,8 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
-public class GetCurrenciesServlet extends HttpServlet {
-    private Dao<CurrencyEntity> dao = new CurrenciesDao();
+public class CurrenciesServlet extends HttpServlet {
+    private Dao<CurrencyEntity, String> dao = new CurrenciesDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,7 +50,7 @@ public class GetCurrenciesServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (dao.exists(currencyEntity)) {
+        if (dao.exists(currencyEntity.getCode())) {
             response.sendError(HttpServletResponse.SC_CONFLICT);
             return;
         }
