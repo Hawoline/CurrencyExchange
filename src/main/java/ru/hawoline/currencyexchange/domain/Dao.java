@@ -2,11 +2,10 @@ package ru.hawoline.currencyexchange.domain;
 
 import java.util.List;
 
-public interface Dao<T, V> {
+public interface Dao<T> {
     void save(T t);
-    T get(V v);
+    T get(int id);
 
-    boolean exists(V v);
     List<T> getAll();
 
     void delete(T t);

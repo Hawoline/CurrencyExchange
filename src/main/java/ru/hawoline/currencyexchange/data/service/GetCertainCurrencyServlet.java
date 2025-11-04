@@ -5,8 +5,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.CurrenciesDao;
+import ru.hawoline.currencyexchange.data.dao.CurrenciesDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.Currency;
 import ru.hawoline.currencyexchange.domain.Dao;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.io.PrintWriter;
 
 @WebServlet(value = "/currency/*")
 public class GetCertainCurrencyServlet extends HttpServlet {
-    private Dao<CurrencyEntity, String> dao = new CurrenciesDao();
+    private CurrenciesDao dao = new CurrenciesDao();
 
 
     @Override

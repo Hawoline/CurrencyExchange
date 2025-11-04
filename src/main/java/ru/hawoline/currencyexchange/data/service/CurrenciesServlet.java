@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
-import ru.hawoline.currencyexchange.data.CurrenciesDao;
+import ru.hawoline.currencyexchange.data.dao.CurrenciesDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.Dao;
 
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private Dao<CurrencyEntity, String> dao = new CurrenciesDao();
+    private CurrenciesDao dao = new CurrenciesDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,10 +28,10 @@ public class CurrenciesServlet extends HttpServlet {
         result.append("[");
         for (CurrencyEntity c :
                 currencies) {
-            result.append("{\"id\": " + c.getId() + ",");
-            result.append("\"name\": \"" + c.getName() + "\",");
-            result.append("\"code\": \"" + c.getCode() + "\",");
-            result.append("\"sign\": \"" + c.getSign() + "\"},");
+            result.append("{\"id\": ").append(c.getId()).append(",");
+            result.append("\"name\": \"").append(c.getName()).append("\",");
+            result.append("\"code\": \"").append(c.getCode()).append("\",");
+            result.append("\"sign\": \"").append(c.getSign()).append("\"},");
         }
         result.append("]");
         out.write(result.toString());

@@ -1,13 +1,13 @@
 package ru.hawoline.currencyexchange.domain;
 
-public class CurrencyExchanger {
+public class ExchangeRate {
     private final Currency baseCurrency;
-    private Currency target;
+    private final Currency targetCurrency;
     private double rate;
 
-    public CurrencyExchanger(Currency baseCurrency, Currency target, double rate) {
+    public ExchangeRate(Currency baseCurrency, Currency targetCurrency, double rate) {
         this.baseCurrency = baseCurrency;
-        this.target = target;
+        this.targetCurrency = targetCurrency;
         this.rate = rate;
     }
 
@@ -15,8 +15,8 @@ public class CurrencyExchanger {
         return baseCurrency;
     }
 
-    public Currency getTarget() {
-        return target;
+    public Currency getTargetCurrency() {
+        return targetCurrency;
     }
 
     public double getRate() {
