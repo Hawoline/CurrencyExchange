@@ -1,14 +1,12 @@
-package ru.hawoline.currencyexchange.data.service;
+package ru.hawoline.currencyexchange.data.servlet;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
-import ru.hawoline.currencyexchange.data.dao.CurrenciesDao;
+import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
-import ru.hawoline.currencyexchange.domain.Dao;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,29 +15,36 @@ import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private CurrenciesDao dao = new CurrenciesDao();
+    private CurrencyDao dao = new CurrencyDao();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
+        PrintWriter out;
+        try {
+            out = resp.getWriter();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         List<CurrencyEntity> currencies = dao.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
-        for (CurrencyEntity c :
+        for (CurrencyEntity currencyEntity :
                 currencies) {
-            result.append("{\"id\": ").append(c.getId()).append(",");
-            result.append("\"name\": \"").append(c.getName()).append("\",");
-            result.append("\"code\": \"").append(c.getCode()).append("\",");
-            result.append("\"sign\": \"").append(c.getSign()).append("\"},");
+            result.append(currencyEntity.toJson()).append(",");
         }
         result.append("]");
         out.write(result.toString());
         out.close();
     }
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String currency = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        String currency;
+        try {
+            currency = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         JSONObject currencyJsonObject = new JSONObject(currency);
         CurrencyEntity currencyEntity = new CurrencyEntity(
                 currencyJsonObject.getString("name"),
@@ -47,11 +52,19 @@ public class CurrenciesServlet extends HttpServlet {
                 currencyJsonObject.getString("sign")
         );
         if (currencyEntity.getSign().isEmpty() || currencyEntity.getName().isEmpty()  || currencyEntity.getCode().isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return;
         }
         if (dao.exists(currencyEntity.getCode())) {
-            response.sendError(HttpServletResponse.SC_CONFLICT);
+            try {
+                response.sendError(HttpServletResponse.SC_CONFLICT);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return;
         }
         dao.save(currencyEntity);

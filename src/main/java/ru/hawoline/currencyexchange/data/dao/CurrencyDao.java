@@ -8,7 +8,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrenciesDao implements Dao<CurrencyEntity> {
+public class CurrencyDao implements Dao<CurrencyEntity> {
     private Connection connection = new Connector().getConnection();
 
     @Override
@@ -16,15 +16,16 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
         List<CurrencyEntity> currencies = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM Currencies";
-            ResultSet resultSet = statement.executeQuery(result);
-            while (resultSet.next()) {
-                CurrencyEntity currency = new CurrencyEntity(
-                        resultSet.getInt("id"),
-                        resultSet.getString("FullName"),
-                        resultSet.getString("Code"),
-                        resultSet.getString("Sign")
-                );
-                currencies.add(currency);
+            try (ResultSet resultSet = statement.executeQuery(result)){
+                while (resultSet.next()) {
+                    CurrencyEntity currency = new CurrencyEntity(
+                            resultSet.getInt("id"),
+                            resultSet.getString("FullName"),
+                            resultSet.getString("Code"),
+                            resultSet.getString("Sign")
+                    );
+                    currencies.add(currency);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -38,8 +39,7 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
                 "'"+ currencyEntity.getCode() + "', " +
                 "'"+ currencyEntity.getName() + "', " +
                 "'"+ currencyEntity.getSign() + "');";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -77,11 +77,11 @@ public class CurrenciesDao implements Dao<CurrencyEntity> {
     }
 
 
-    public boolean exists(String id) {
+    public boolean exists(String code) {
         try {
             String sql = "SELECT EXISTS(SELECT 1 FROM Currencies WHERE code = ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, id);
+            preparedStatement.setString(1, code);
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 return rs.getInt(1) == 1;
             }
