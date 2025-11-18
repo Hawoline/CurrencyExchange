@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,18 +40,15 @@ public class CurrenciesServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String currency;
+        String currencyRequestString;
         try {
-            currency = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        JSONObject currencyJsonObject = new JSONObject(currency);
-        CurrencyEntity currencyEntity = new CurrencyEntity(
-                currencyJsonObject.getString("name"),
-                currencyJsonObject.getString("code"),
-                currencyJsonObject.getString("sign")
-        );
+
+
+        CurrencyEntity currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
         if (currencyEntity.getSign().isEmpty() || currencyEntity.getName().isEmpty()  || currencyEntity.getCode().isEmpty()) {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);

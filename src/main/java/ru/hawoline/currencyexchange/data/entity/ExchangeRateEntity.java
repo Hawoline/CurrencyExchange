@@ -37,6 +37,9 @@ public class ExchangeRateEntity implements Entity {
 
     @Override
     public String toJson() {
-        return "";
+        return "{\"id\": " + id + "," +
+                "\"baseCurrency\": " + baseCurrencyId + "," +
+                "\"code\": " + targetCurrencyId + "," +
+                "\"rate\": \"" + rate + "\"}";
     }
 }
