@@ -1,5 +1,7 @@
 package ru.hawoline.currencyexchange.domain;
 
+import java.util.Currency;
+
 public class ExchangeRate {
     private final Currency baseCurrency;
     private final Currency targetCurrency;
