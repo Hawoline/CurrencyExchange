@@ -30,24 +30,8 @@ public class CurrencyEntity implements Entity {
         return sign;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public void setSign(String sign) {
-        this.sign = sign;
-    }
-
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     @Override

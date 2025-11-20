@@ -2,6 +2,7 @@ package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
 import ru.hawoline.currencyexchange.domain.Dao;
 
 import java.sql.*;
@@ -10,6 +11,8 @@ import java.util.List;
 
 public class CurrencyDao implements Dao<CurrencyEntity> {
     private Connection connection = new Connector().getConnection();
+    private CurrencyMapper currencyMapper = new CurrencyMapper();
+    private CurrencyEntity cache;
 
     @Override
     public List<CurrencyEntity> getAll() {
@@ -18,12 +21,7 @@ public class CurrencyDao implements Dao<CurrencyEntity> {
             String result = "SELECT * FROM Currencies";
             try (ResultSet resultSet = statement.executeQuery(result)){
                 while (resultSet.next()) {
-                    CurrencyEntity currency = new CurrencyEntity(
-                            resultSet.getInt("id"),
-                            resultSet.getString("FullName"),
-                            resultSet.getString("Code"),
-                            resultSet.getString("Sign")
-                    );
+                    CurrencyEntity currency = currencyMapper.fromResultSet(resultSet);
                     currencies.add(currency);
                 }
             }
@@ -51,12 +49,7 @@ public class CurrencyDao implements Dao<CurrencyEntity> {
     public CurrencyEntity get(int id) {
         String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return new CurrencyEntity(
-                    resultSet.getInt("id"),
-                    resultSet.getString("FullName"),
-                    resultSet.getString("code"),
-                    resultSet.getString("sign")
-            );
+            return currencyMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -65,12 +58,7 @@ public class CurrencyDao implements Dao<CurrencyEntity> {
     public CurrencyEntity get(String code) {
         String sql = "SELECT * FROM Currencies WHERE Code = '"+ code +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return new CurrencyEntity(
-                    resultSet.getInt("id"),
-                    resultSet.getString("FullName"),
-                    resultSet.getString("code"),
-                    resultSet.getString("sign")
-            );
+            return currencyMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

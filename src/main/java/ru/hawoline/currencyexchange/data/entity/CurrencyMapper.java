@@ -1,6 +1,8 @@
 package ru.hawoline.currencyexchange.data.entity;
 
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Currency;
 
 public class CurrencyMapper {
@@ -30,5 +32,14 @@ public class CurrencyMapper {
         }
 
         return new CurrencyEntity(name, code, sign);
+    }
+
+    public CurrencyEntity fromResultSet(ResultSet resultSet) throws SQLException {
+        return new CurrencyEntity(
+                resultSet.getInt("id"),
+                resultSet.getString("FullName"),
+                resultSet.getString("code"),
+                resultSet.getString("sign")
+        );
     }
 }
