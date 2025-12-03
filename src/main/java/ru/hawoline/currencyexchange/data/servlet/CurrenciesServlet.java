@@ -4,8 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
-import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
+import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
 
@@ -18,6 +17,12 @@ import java.util.stream.Collectors;
 public class CurrenciesServlet extends HttpServlet {
     private CurrencyDao dao = new CurrencyDao();
 
+    // TODO fix bug {
+    //        "id": 5,
+    //        "name": "AFN",
+    //        "code": "Afghani",
+    //        "sign": "%D8%8B"
+    //    }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
@@ -32,7 +37,7 @@ public class CurrenciesServlet extends HttpServlet {
         result.append("[");
         for (CurrencyEntity currencyEntity :
                 currencies) {
-            result.append(currencyEntity.toJson()).append(",");
+            result.append(currencyEntity.toString()).append(",");
         }
         result.append("]");
         out.write(result.toString());
@@ -49,7 +54,9 @@ public class CurrenciesServlet extends HttpServlet {
 
 
         CurrencyEntity currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
-        if (currencyEntity.getSign().isEmpty() || currencyEntity.getName().isEmpty()  || currencyEntity.getCode().isEmpty()) {
+        if (currencyEntity.getSign().isEmpty()
+                || currencyEntity.getName().isEmpty()
+                || currencyEntity.getCode().isEmpty()) {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             } catch (IOException e) {

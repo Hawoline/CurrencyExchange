@@ -5,9 +5,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.data.entity.ExchangeRateResponseEntity;
+import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
+import ru.hawoline.currencyexchange.data.repository.ExchangeRateDao;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,8 +41,8 @@ public class ExchangeRateServlet extends HttpServlet {
             out.close();
             return;
         }
-        ExchangeRateResponseEntity exchangeRateResponseEntity = exchangeRateDao.get(baseCurrencyCode, targetCurrencyCode);
-        out.write(exchangeRateResponseEntity.toJson());
+        ExchangeRateResponse exchangeRateResponse = exchangeRateDao.get(baseCurrencyCode, targetCurrencyCode);
+        out.write(exchangeRateResponse.toString());
         out.close();
     }
 

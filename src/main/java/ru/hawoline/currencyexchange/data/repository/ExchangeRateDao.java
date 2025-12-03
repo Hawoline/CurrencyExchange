@@ -1,7 +1,7 @@
-package ru.hawoline.currencyexchange.data.dao;
+package ru.hawoline.currencyexchange.data.repository;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.data.entity.ExchangeRateResponseEntity;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
 import ru.hawoline.currencyexchange.domain.Dao;
 
 import java.sql.*;
@@ -9,23 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExchangeRateDao implements Dao<ExchangeRateResponseEntity> {
+public class ExchangeRateDao implements Dao<ExchangeRateResponse> {
     private Connection connection = new Connector().getConnection();
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    public void save(ExchangeRateResponseEntity exchangeRate) {
+    public void save(ExchangeRateResponse exchangeRate) {
 
     }
 
     @Override
-    public ExchangeRateResponseEntity get(int id) {
+    public ExchangeRateResponse get(int id) {
         return null;
     }
 
-    public ExchangeRateResponseEntity get(String baseCurrencyCode, String targetCurrencyCode) {
-        List<ExchangeRateResponseEntity> exchangeRates = getAll();
-        for (ExchangeRateResponseEntity exchangeRate: exchangeRates) {
+    public ExchangeRateResponse get(String baseCurrencyCode, String targetCurrencyCode) {
+        List<ExchangeRateResponse> exchangeRates = getAll();
+        for (ExchangeRateResponse exchangeRate: exchangeRates) {
             boolean baseCurrencyCodeFromDbEqualsToUser = exchangeRate.getBaseCurrency().getCode().equals(baseCurrencyCode);
             boolean targetCurrencyCodeFromDbEqualsToUser = exchangeRate.getTargetCurrency().getCode().equals(targetCurrencyCode);
             if ( baseCurrencyCodeFromDbEqualsToUser && targetCurrencyCodeFromDbEqualsToUser) {
@@ -58,19 +58,19 @@ public class ExchangeRateDao implements Dao<ExchangeRateResponseEntity> {
     }
 
     @Override
-    public List<ExchangeRateResponseEntity> getAll() {
-        List<ExchangeRateResponseEntity> exchangeRates = new ArrayList<>();
+    public List<ExchangeRateResponse> getAll() {
+        List<ExchangeRateResponse> exchangeRates = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM ExchangeRates";
             try (ResultSet resultSet = statement.executeQuery(result)) {
                 while (resultSet.next()) {
-                    ExchangeRateResponseEntity exchangeRateResponseEntity = new ExchangeRateResponseEntity(
+                    ExchangeRateResponse exchangeRateResponse = new ExchangeRateResponse(
                             resultSet.getInt("ID"),
                             currencyDao.get(resultSet.getInt("BaseCurrencyId")),
                             currencyDao.get(resultSet.getInt("TargetCurrencyId")),
                             resultSet.getDouble("Rate")
                     );
-                    exchangeRates.add(exchangeRateResponseEntity);
+                    exchangeRates.add(exchangeRateResponse);
                 }
             }
         } catch (SQLException e) {
@@ -80,7 +80,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateResponseEntity> {
     }
 
     @Override
-    public void delete(ExchangeRateResponseEntity exchangeRate) {
+    public void delete(ExchangeRateResponse exchangeRate) {
 
     }
 

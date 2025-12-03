@@ -1,21 +1,21 @@
-package ru.hawoline.currencyexchange.data.entity;
+package ru.hawoline.currencyexchange.domain.entity;
 
-import ru.hawoline.currencyexchange.domain.Entity;
+import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
 
-public class ExchangeRateResponseEntity implements Entity {
-    private final int id;
+public class ExchangeRateResponse {
+    private final long id;
     private final CurrencyEntity baseCurrency;
     private final CurrencyEntity targetCurrency;
     private final double rate;
 
-    public ExchangeRateResponseEntity(int id, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, double rate) {
+    public ExchangeRateResponse(long id, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, double rate) {
         this.id = id;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -32,11 +32,11 @@ public class ExchangeRateResponseEntity implements Entity {
     }
 
     @Override
-    public String toJson() {
+    public String toString() {
 
         return "{\"id\": " + id + "," +
-                "\"baseCurrency\": " + baseCurrency.toJson() + "," +
-                "\"code\": " + targetCurrency.toJson() + "," +
+                "\"baseCurrency\": " + baseCurrency.toString() + "," +
+                "\"code\": " + targetCurrency.toString() + "," +
                 "\"rate\": \"" + rate + "\"}";
     }
 }

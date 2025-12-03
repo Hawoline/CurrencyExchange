@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.data.dao;
+package ru.hawoline.currencyexchange.data.repository;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;

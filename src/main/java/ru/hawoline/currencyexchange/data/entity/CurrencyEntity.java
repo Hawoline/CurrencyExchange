@@ -1,8 +1,6 @@
 package ru.hawoline.currencyexchange.data.entity;
 
-import ru.hawoline.currencyexchange.domain.Entity;
-
-public class CurrencyEntity implements Entity {
+public class CurrencyEntity {
     private int id;
     private String name;
     private String code;
@@ -35,7 +33,7 @@ public class CurrencyEntity implements Entity {
     }
 
     @Override
-    public String toJson() {
+    public String toString() {
         String result = "{\"id\": " + id + "," +
                 "\"name\": \"" + name + "\"," +
                 "\"code\": \"" + code + "\"," +
