@@ -12,11 +12,15 @@ public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertE
 
     @Override
     public Long save(ExchangeRateInsertEntity entity) {
+        boolean isAdded = false;
         try (PreparedStatement preparedStatement = connection.prepareStatement(
-                "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (" +
-                        entity.getBaseCurrencyId() + "," + entity.getTargetCurrencyId() + "," + entity.getRate() + ");",
+                "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
+            preparedStatement.setInt(1, entity.getBaseCurrencyId());
+            preparedStatement.setInt(2, entity.getTargetCurrencyId());
+            preparedStatement.setDouble(3, entity.getRate());
+
             int affectedRows = preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {

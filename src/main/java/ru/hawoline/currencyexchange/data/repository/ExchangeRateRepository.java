@@ -1,6 +1,7 @@
 package ru.hawoline.currencyexchange.data.repository;
 
 import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateSqlDataSource;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateInsertEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
@@ -10,37 +11,24 @@ import ru.hawoline.currencyexchange.domain.repository.Specification;
 
 import java.util.ArrayList;
 import java.util.List;
-
-public class ExchangeRateRepository implements Repository<ExchangeRateRequestBody, String> {
+public class ExchangeRateRepository implements Repository<ExchangeRateRequestBody, ExchangeRateResponse> {
     public static final String EXCHANGE_RATE_ALREADY_SAVED = "EXCHANGE_RATE_ALREADY_SAVED";
     public static final String ONE_OR_MORE_RATE_NOT_EXISTS = "ONE_OR_MORE_RATE_NOT_EXISTS";
-    private DataSource<ExchangeRateInsertEntity, Long> localStorage;
+    private ExchangeRateSqlDataSource localStorage;
     private CurrencyDao currencyDao = new CurrencyDao();
 
-    private List<ExchangeRateRequestBody> exchangeRateRequestBodyList = new ArrayList<>();
-
-    public ExchangeRateRepository(DataSource<ExchangeRateInsertEntity, Long> localStorage) {
+    public ExchangeRateRepository(ExchangeRateSqlDataSource localStorage) {
         this.localStorage = localStorage;
     }
 
-    // Идеально
     @Override
-    public String add(ExchangeRateRequestBody entity) {
-        if (exchangeRateRequestBodyList.contains(entity)) {
-            return EXCHANGE_RATE_ALREADY_SAVED;
-        }
+    public ExchangeRateResponse add(ExchangeRateRequestBody entity) {
         CurrencyEntity baseCurrencyEntity = currencyDao.get(entity.getBaseCurrencyCode());
         CurrencyEntity targetCurrencyEntity = currencyDao.get(entity.getTargetCurrencyCode());
-        if (baseCurrencyEntity == null || targetCurrencyEntity == null) {
-            return ONE_OR_MORE_RATE_NOT_EXISTS;
-        }
         long savedId = localStorage.save(new ExchangeRateInsertEntity(
                 baseCurrencyEntity.getId(), targetCurrencyEntity.getId(), entity.getRate()
         ));
-        if (savedId > 0) {
-            exchangeRateRequestBodyList.add(entity);
-        }
-        return new ExchangeRateResponse(savedId, baseCurrencyEntity, targetCurrencyEntity, entity.getRate()).toString();
+        return new ExchangeRateResponse(savedId, baseCurrencyEntity, targetCurrencyEntity, entity.getRate());
     }
 
     @Override
