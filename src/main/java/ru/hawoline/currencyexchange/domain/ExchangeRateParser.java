@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.data;
+package ru.hawoline.currencyexchange.domain;
 
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 

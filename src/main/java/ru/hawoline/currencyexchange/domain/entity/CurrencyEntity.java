@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.data.entity;
+package ru.hawoline.currencyexchange.domain.entity;
 
 public class CurrencyEntity {
     private int id;

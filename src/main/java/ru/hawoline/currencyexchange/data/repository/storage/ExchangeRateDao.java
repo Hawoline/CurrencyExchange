@@ -1,6 +1,7 @@
-package ru.hawoline.currencyexchange.data.repository;
+package ru.hawoline.currencyexchange.data.repository.storage;
 
 import ru.hawoline.currencyexchange.data.Connector;
+import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
 import ru.hawoline.currencyexchange.domain.Dao;
 

@@ -1,7 +1,5 @@
 package ru.hawoline.currencyexchange.domain.entity;
 
-import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
-
 public class ExchangeRateResponse {
     private final long id;
     private final CurrencyEntity baseCurrency;

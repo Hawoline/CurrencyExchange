@@ -1,23 +1,17 @@
-package ru.hawoline.currencyexchange.data.repository;
+package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.data.entity.CurrencyEntity;
-import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateSqlDataSource;
+import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateInsertEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
 import ru.hawoline.currencyexchange.domain.repository.DataSource;
-import ru.hawoline.currencyexchange.domain.repository.Repository;
-import ru.hawoline.currencyexchange.domain.repository.Specification;
 
-import java.util.ArrayList;
-import java.util.List;
-public class ExchangeRateRepository implements Repository<ExchangeRateRequestBody, ExchangeRateResponse> {
-    public static final String EXCHANGE_RATE_ALREADY_SAVED = "EXCHANGE_RATE_ALREADY_SAVED";
-    public static final String ONE_OR_MORE_RATE_NOT_EXISTS = "ONE_OR_MORE_RATE_NOT_EXISTS";
-    private ExchangeRateSqlDataSource localStorage;
+public class ExchangeRateService implements Service<ExchangeRateRequestBody, ExchangeRateResponse> {
+    private DataSource<ExchangeRateInsertEntity, Long> localStorage;
     private CurrencyDao currencyDao = new CurrencyDao();
 
-    public ExchangeRateRepository(ExchangeRateSqlDataSource localStorage) {
+    public ExchangeRateService(DataSource<ExchangeRateInsertEntity, Long> localStorage) {
         this.localStorage = localStorage;
     }
 
@@ -39,10 +33,5 @@ public class ExchangeRateRepository implements Repository<ExchangeRateRequestBod
     @Override
     public void update(ExchangeRateRequestBody entity) {
 
-    }
-
-    @Override
-    public List<ExchangeRateRequestBody> query(Specification<ExchangeRateRequestBody> specification) {
-        return List.of();
     }
 }

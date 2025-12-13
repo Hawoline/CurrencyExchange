@@ -4,13 +4,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.ExchangeRateParser;
+import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
-import ru.hawoline.currencyexchange.data.repository.ExchangeRateDao;
+import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateDao;
 import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateSqlDataSource;
 import ru.hawoline.currencyexchange.domain.Dao;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
-import ru.hawoline.currencyexchange.data.repository.ExchangeRateRepository;
+import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private ExchangeRateRepository exchangeRateRepository = new ExchangeRateRepository(new ExchangeRateSqlDataSource());
+    private ExchangeRateService exchangeRateRepository = new ExchangeRateService(new ExchangeRateSqlDataSource());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -87,22 +87,6 @@ public class ExchangeRatesServlet extends HttpServlet {
         }
 
         String exchangeRateResponseString = exchangeRateRepository.add(exchangeRateRequestBody).toString();
-        if (exchangeRateResponseString.equals(ExchangeRateRepository.EXCHANGE_RATE_ALREADY_SAVED)) {
-            try {
-                response.sendError(HttpServletResponse.SC_CONFLICT);
-            } catch (IOException e) {
-                throw new RuntimeException(e); // Для отладки, TODO потом нормально обработать
-            }
-            return;
-        }
-        if (exchangeRateResponseString.equals(ExchangeRateRepository.ONE_OR_MORE_RATE_NOT_EXISTS)) {
-            try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } catch (IOException e) {
-                throw new RuntimeException(e); // Для отладки, TODO потом нормально обработать
-            }
-            return;
-        }
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(exchangeRateResponseString);
         } catch (IOException e) {

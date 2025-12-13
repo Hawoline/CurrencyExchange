@@ -1,9 +1,10 @@
 package ru.hawoline.currencyexchange.data.entity;
 
 
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Currency;
 
 public class CurrencyMapper {
     public CurrencyEntity fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {

@@ -12,7 +12,6 @@ public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertE
 
     @Override
     public Long save(ExchangeRateInsertEntity entity) {
-        boolean isAdded = false;
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
@@ -21,7 +20,7 @@ public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertE
             preparedStatement.setInt(2, entity.getTargetCurrencyId());
             preparedStatement.setDouble(3, entity.getRate());
 
-            int affectedRows = preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return generatedKeys.getLong(1);
