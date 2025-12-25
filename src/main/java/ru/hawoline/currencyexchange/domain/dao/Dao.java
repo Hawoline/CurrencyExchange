@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.dao;
 
 import java.util.List;
 

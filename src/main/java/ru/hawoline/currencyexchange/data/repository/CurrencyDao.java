@@ -3,7 +3,7 @@ package ru.hawoline.currencyexchange.data.repository;
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
-import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;

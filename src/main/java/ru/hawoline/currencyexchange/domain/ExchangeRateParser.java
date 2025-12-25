@@ -1,14 +1,14 @@
 package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
+import ru.hawoline.currencyexchange.domain.entity.AddExchangeRateDto;
 
 public class ExchangeRateParser {
-    public ExchangeRateRequestBody parseRequestBody(String requestURI) {
+    public AddExchangeRateDto parseRequestBody(String requestUri) {
         /**
          * Пример body:
          * baseCurrencyCode=AAA&targetCurrencyCode=AAB&rate=0.9
          */
-        String[] pairs =  requestURI.split("&"); // baseCurrencyCode=AAA ...
+        String[] pairs =  requestUri.split("&"); // baseCurrencyCode=AAA ...
         String baseCurrencyCode = "";
         String targetCurrencyCode = "";
         double rate = 0;
@@ -23,6 +23,6 @@ public class ExchangeRateParser {
             }
         }
 
-        return new ExchangeRateRequestBody(baseCurrencyCode, targetCurrencyCode, rate);
+        return new AddExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
     }
 }
