@@ -3,8 +3,8 @@ package ru.hawoline.currencyexchange.domain;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 
 public class ExchangeRateParser {
-    public ExchangeRateRequestBody parseRequestBody(String requestURI) {
-        String[] pairs =  requestURI.split("&");
+    public ExchangeRateRequestBody parseRequestBody(String requestUri) {
+        String[] pairs =  requestUri.split("&");
         String baseCurrencyCode = "";
         String targetCurrencyCode = "";
         double rate = 0;

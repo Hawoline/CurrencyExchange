@@ -25,7 +25,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
         response.setContentType("application/json");
-        PrintWriter out;
+        PrintWriter out = null;
         try {
             out = response.getWriter();
         } catch (IOException e) {
@@ -58,7 +58,7 @@ public class ExchangeRatesServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
                 return;
             } catch (IOException e) {
-                throw new RuntimeException();
+                e.printStackTrace();
             }
         }
         exchangeRateService.add(exchangeRateRequestBody);
@@ -66,7 +66,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(exchangeRateResponseString);
         } catch (IOException e) {
-            throw new RuntimeException();
+            e.printStackTrace();
         }
     }
 }

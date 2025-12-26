@@ -66,7 +66,7 @@ public class CurrenciesServlet extends HttpServlet {
         }
         if (dao.exists(currencyEntity.getCode())) {
             try {
-                response.sendError(HttpServletResponse.SC_CONFLICT);
+                response.sendError(HttpServletResponse.SC_CONFLICT, "Currency with this code exists");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

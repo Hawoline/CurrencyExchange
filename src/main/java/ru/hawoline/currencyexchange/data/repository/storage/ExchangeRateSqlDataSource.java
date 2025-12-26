@@ -10,7 +10,7 @@ public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertE
     private Connection connection = new Connector().getConnection();
 
     @Override
-    public Long save(ExchangeRateInsertEntity entity) {
+    public Long saveAndGetId(ExchangeRateInsertEntity entity) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
