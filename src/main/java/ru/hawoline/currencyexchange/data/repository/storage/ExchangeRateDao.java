@@ -3,14 +3,14 @@ package ru.hawoline.currencyexchange.data.repository.storage;
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
-import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExchangeRateDao implements Dao<ExchangeRateResponse> {
+public class ExchangeRateDao implements Dao<ExchangeRateResponse, Integer> {
     private Connection connection = new Connector().getConnection();
     private CurrencyDao currencyDao = new CurrencyDao();
 
@@ -20,7 +20,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateResponse> {
     }
 
     @Override
-    public ExchangeRateResponse get(int id) {
+    public ExchangeRateResponse get(Integer id) {
         return null;
     }
 

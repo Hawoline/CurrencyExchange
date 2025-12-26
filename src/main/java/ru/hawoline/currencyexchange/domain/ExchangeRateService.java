@@ -5,24 +5,30 @@ import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateInsertEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
-import ru.hawoline.currencyexchange.domain.repository.DataSource;
+import ru.hawoline.currencyexchange.domain.dao.DataSource;
 
 public class ExchangeRateService implements Service<ExchangeRateRequestBody, ExchangeRateResponse> {
     private DataSource<ExchangeRateInsertEntity, Long> localStorage;
     private CurrencyDao currencyDao = new CurrencyDao();
+    private ExchangeRateResponse exchangeRateResponse;
 
     public ExchangeRateService(DataSource<ExchangeRateInsertEntity, Long> localStorage) {
         this.localStorage = localStorage;
     }
 
     @Override
-    public ExchangeRateResponse add(ExchangeRateRequestBody entity) {
+    public void add(ExchangeRateRequestBody entity) {
         CurrencyEntity baseCurrencyEntity = currencyDao.get(entity.getBaseCurrencyCode());
         CurrencyEntity targetCurrencyEntity = currencyDao.get(entity.getTargetCurrencyCode());
         long savedId = localStorage.save(new ExchangeRateInsertEntity(
                 baseCurrencyEntity.getId(), targetCurrencyEntity.getId(), entity.getRate()
         ));
-        return new ExchangeRateResponse(savedId, baseCurrencyEntity, targetCurrencyEntity, entity.getRate());
+        exchangeRateResponse = new ExchangeRateResponse(savedId, baseCurrencyEntity, targetCurrencyEntity, entity.getRate());
+    }
+
+    @Override
+    public ExchangeRateResponse get() {
+        return exchangeRateResponse;
     }
 
     @Override

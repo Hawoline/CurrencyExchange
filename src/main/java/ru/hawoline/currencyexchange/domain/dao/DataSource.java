@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain.repository;
+package ru.hawoline.currencyexchange.domain.dao;
 
 public interface DataSource<T, V> {
     V save(T entity);

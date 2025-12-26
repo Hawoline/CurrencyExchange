@@ -8,7 +8,6 @@ import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
 import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateDao;
 import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateSqlDataSource;
-import ru.hawoline.currencyexchange.domain.Dao;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
@@ -20,13 +19,13 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateRepository = new ExchangeRateService(new ExchangeRateSqlDataSource());
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateSqlDataSource());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        Dao<ExchangeRateResponse> exchangeRateDao = new ExchangeRateDao();
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
         response.setContentType("application/json");
-        PrintWriter out = null;
+        PrintWriter out;
         try {
             out = response.getWriter();
         } catch (IOException e) {
@@ -44,29 +43,6 @@ public class ExchangeRatesServlet extends HttpServlet {
         out.close();
     }
 
-    /**
-     * Пример body:
-     * baseCurrencyCode=AAA&targetCurrencyCode=AAB&rate=0.9
-     * Пример ответа:
-     * exchangeRateResponseEntity {
-     *  "id": 0,
-     *  "baseCurrency": {
-     *   "id": 0,
-     *   "name": "United States dollar",
-     *   "code": "USD",
-     *   "sign": "$"
-     * },
-     * "targetCurrency": {
-     *  "id": 1,
-     *  "name": "Euro",
-     *  "code": "EUR",
-     *  "sign": "€"
-     * },
-     * "rate": 0.99
-     *}
-     *
-     * TODO реализовать все эти методыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыыы
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
@@ -82,15 +58,15 @@ public class ExchangeRatesServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
                 return;
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException();
             }
         }
-
-        String exchangeRateResponseString = exchangeRateRepository.add(exchangeRateRequestBody).toString();
+        exchangeRateService.add(exchangeRateRequestBody);
+        String exchangeRateResponseString = exchangeRateService.get().toString();
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(exchangeRateResponseString);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
     }
 }

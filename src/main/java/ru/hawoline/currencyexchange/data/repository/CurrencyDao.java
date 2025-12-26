@@ -3,16 +3,15 @@ package ru.hawoline.currencyexchange.data.repository;
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
-import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyDao implements Dao<CurrencyEntity> {
+public class CurrencyDao implements Dao<CurrencyEntity, Integer> {
     private Connection connection = new Connector().getConnection();
     private CurrencyMapper currencyMapper = new CurrencyMapper();
-    private CurrencyEntity cache;
 
     @Override
     public List<CurrencyEntity> getAll() {
@@ -46,7 +45,7 @@ public class CurrencyDao implements Dao<CurrencyEntity> {
 
 
     @Override
-    public CurrencyEntity get(int id) {
+    public CurrencyEntity get(Integer id) {
         String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyMapper.fromResultSet(resultSet);

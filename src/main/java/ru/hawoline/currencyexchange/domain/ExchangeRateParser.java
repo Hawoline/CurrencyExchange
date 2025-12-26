@@ -4,11 +4,7 @@ import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
 
 public class ExchangeRateParser {
     public ExchangeRateRequestBody parseRequestBody(String requestURI) {
-        /**
-         * Пример body:
-         * baseCurrencyCode=AAA&targetCurrencyCode=AAB&rate=0.9
-         */
-        String[] pairs =  requestURI.split("&"); // baseCurrencyCode=AAA ...
+        String[] pairs =  requestURI.split("&");
         String baseCurrencyCode = "";
         String targetCurrencyCode = "";
         double rate = 0;
