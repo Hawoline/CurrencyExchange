@@ -1,17 +1,17 @@
-package ru.hawoline.currencyexchange.data.repository;
+package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
-import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
+import ru.hawoline.currencyexchange.domain.dao.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyDao implements Dao<CurrencyEntity, Integer> {
+public class CurrencyDao implements Dao<CurrencyEntity, String> {
     private Connection connection = new Connector().getConnection();
-    private CurrencyMapper currencyMapper = new CurrencyMapper();
+    private CurrencyEntityMapper currencyEntityMapper = new CurrencyEntityMapper();
 
     @Override
     public List<CurrencyEntity> getAll() {
@@ -20,7 +20,7 @@ public class CurrencyDao implements Dao<CurrencyEntity, Integer> {
             String result = "SELECT * FROM Currencies";
             try (ResultSet resultSet = statement.executeQuery(result)){
                 while (resultSet.next()) {
-                    CurrencyEntity currency = currencyMapper.fromResultSet(resultSet);
+                    CurrencyEntity currency = currencyEntityMapper.fromResultSet(resultSet);
                     currencies.add(currency);
                 }
             }
@@ -45,19 +45,20 @@ public class CurrencyDao implements Dao<CurrencyEntity, Integer> {
 
 
     @Override
-    public CurrencyEntity get(Integer id) {
+    public CurrencyEntity getById(long id) {
         String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return currencyMapper.fromResultSet(resultSet);
+            return currencyEntityMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public CurrencyEntity get(String code) {
-        String sql = "SELECT * FROM Currencies WHERE Code = '"+ code +"';";
+    @Override
+    public CurrencyEntity getBySpecification(String specification) {
+        String sql = "SELECT * FROM Currencies WHERE Code = '"+ specification +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return currencyMapper.fromResultSet(resultSet);
+            return currencyEntityMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

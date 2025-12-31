@@ -4,8 +4,8 @@ import java.util.List;
 
 public interface Dao<T, V> {
     void save(T t);
-    T get(V id);
-
+    T getById(long id);
+    T getBySpecification(V specification);
     List<T> getAll();
 
     void delete(T t);

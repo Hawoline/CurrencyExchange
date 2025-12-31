@@ -4,9 +4,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.repository.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
-import ru.hawoline.currencyexchange.data.entity.CurrencyMapper;
+import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
+import ru.hawoline.currencyexchange.domain.dao.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,12 +17,7 @@ import java.util.stream.Collectors;
 public class CurrenciesServlet extends HttpServlet {
     private CurrencyDao dao = new CurrencyDao();
 
-    // TODO fix bug {
-    //        "id": 5,
-    //        "name": "AFN",
-    //        "code": "Afghani",
-    //        "sign": "%D8%8B"
-    //    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
@@ -33,16 +28,29 @@ public class CurrenciesServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
         List<CurrencyEntity> currencies = dao.getAll();
+
+        StringBuilder result = toJsonString(currencies);
+        out.write(result.toString());
+        out.close();
+    }
+
+    private StringBuilder toJsonString(List<CurrencyEntity> currencies) {
         StringBuilder result = new StringBuilder();
         result.append("[");
         for (CurrencyEntity currencyEntity :
                 currencies) {
             result.append(currencyEntity.toString()).append(",");
         }
+        // TODO убрать последнюю запятую
         result.append("]");
-        out.write(result.toString());
-        out.close();
+        return result;
     }
+    // TODO fix bug {
+    //        "id": 5,
+    //        "name": "AFN",
+    //        "code": "Afghani",
+    //        "sign": "%D8%8B"
+    //    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String currencyRequestString;
@@ -53,7 +61,7 @@ public class CurrenciesServlet extends HttpServlet {
         }
 
 
-        CurrencyEntity currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        CurrencyEntity currencyEntity = new CurrencyEntityMapper().fromXWwwFormUrlEncoded(currencyRequestString);
         if (currencyEntity.getSign().isEmpty()
                 || currencyEntity.getName().isEmpty()
                 || currencyEntity.getCode().isEmpty()) {

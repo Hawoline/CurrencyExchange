@@ -6,11 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
-import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateDao;
-import ru.hawoline.currencyexchange.data.repository.storage.ExchangeRateSqlDataSource;
-import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
-import ru.hawoline.currencyexchange.domain.ExchangeRateService;
-import ru.hawoline.currencyexchange.domain.entity.ExchangeRateResponse;
+import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
+import ru.hawoline.currencyexchange.data.dao.ExchangeRateSqlDataSource;
+import ru.hawoline.currencyexchange.domain.dao.entity.AddExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
+import ru.hawoline.currencyexchange.domain.dao.entity.ExchangeRateDto;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,10 +31,10 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        List<ExchangeRateResponse> exchangeRateEntities = exchangeRateDao.getAll();
+        List<ExchangeRateDto> exchangeRateEntities = exchangeRateDao.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
-        for (ExchangeRateResponse exchangeRateResponse :
+        for (ExchangeRateDto exchangeRateResponse :
                 exchangeRateEntities) {
             result.append(exchangeRateResponse.toString()).append(",");
         }
@@ -46,7 +46,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
-        ExchangeRateRequestBody exchangeRateRequestBody;
+        AddExchangeRateDto exchangeRateRequestBody;
         try {
             exchangeRateRequestBody = exchangeRateParser.parseRequestBody(request.getReader().lines().collect(Collectors.joining(System.lineSeparator())));
         } catch (IOException e) {

@@ -1,9 +1,10 @@
 package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.domain.entity.ExchangeRateRequestBody;
+
+import ru.hawoline.currencyexchange.domain.dao.entity.AddExchangeRateDto;
 
 public class ExchangeRateParser {
-    public ExchangeRateRequestBody parseRequestBody(String requestUri) {
+    public AddExchangeRateDto parseRequestBody(String requestUri) {
         String[] pairs =  requestUri.split("&");
         String baseCurrencyCode = "";
         String targetCurrencyCode = "";
@@ -19,6 +20,6 @@ public class ExchangeRateParser {
             }
         }
 
-        return new ExchangeRateRequestBody(baseCurrencyCode, targetCurrencyCode, rate);
+        return new AddExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
     }
 }

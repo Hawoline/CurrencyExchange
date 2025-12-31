@@ -1,7 +1,7 @@
-package ru.hawoline.currencyexchange.data.repository.storage;
+package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.entity.ExchangeRateInsertEntity;
+import ru.hawoline.currencyexchange.domain.dao.entity.ExchangeRateInsertEntity;
 import ru.hawoline.currencyexchange.domain.dao.DataSource;
 
 import java.sql.*;
@@ -9,8 +9,7 @@ import java.sql.*;
 public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertEntity, Long> {
     private Connection connection = new Connector().getConnection();
 
-    @Override
-    public Long saveAndGetId(ExchangeRateInsertEntity entity) {
+    public Long save(ExchangeRateInsertEntity entity) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
@@ -31,6 +30,7 @@ public class ExchangeRateSqlDataSource implements DataSource<ExchangeRateInsertE
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     @Override

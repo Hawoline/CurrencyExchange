@@ -1,14 +1,12 @@
-package ru.hawoline.currencyexchange.domain.entity;
+package ru.hawoline.currencyexchange.domain.dao;
 
-public class AddExchangeRateDto {
+public class ExchangeRateGetSpecification {
     private final String baseCurrencyCode;
     private final String targetCurrencyCode;
-    private final double rate;
 
-    public AddExchangeRateDto(String baseCurrencyCode, String targetCurrencyCode, double rate) {
+    public ExchangeRateGetSpecification(String baseCurrencyCode, String targetCurrencyCode) {
         this.baseCurrencyCode = baseCurrencyCode;
         this.targetCurrencyCode = targetCurrencyCode;
-        this.rate = rate;
     }
 
     public String getBaseCurrencyCode() {
@@ -17,9 +15,5 @@ public class AddExchangeRateDto {
 
     public String getTargetCurrencyCode() {
         return targetCurrencyCode;
-    }
-
-    public double getRate() {
-        return rate;
     }
 }

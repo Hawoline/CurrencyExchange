@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.data;
 
-import ru.hawoline.currencyexchange.domain.entity.AddExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.entity.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.Validator;
 
 public class ExchangeRateRequestBodyValidator implements Validator<AddExchangeRateDto> {
