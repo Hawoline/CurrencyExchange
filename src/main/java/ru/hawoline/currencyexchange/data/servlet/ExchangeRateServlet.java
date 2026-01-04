@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateGetSpecification;
-import ru.hawoline.currencyexchange.domain.dao.entity.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 
 import java.io.IOException;
 import java.io.PrintWriter;

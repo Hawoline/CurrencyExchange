@@ -1,12 +1,12 @@
-package ru.hawoline.currencyexchange.domain.dao.entity;
+package ru.hawoline.currencyexchange.domain.dao.dto;
 
 public class ExchangeRateDto {
     private final long id;
-    private final CurrencyEntity baseCurrency;
-    private final CurrencyEntity targetCurrency;
+    private final CurrencyDto baseCurrency;
+    private final CurrencyDto targetCurrency;
     private final double rate;
 
-    public ExchangeRateDto(long id, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, double rate) {
+    public ExchangeRateDto(long id, CurrencyDto baseCurrency, CurrencyDto targetCurrency, double rate) {
         this.id = id;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
@@ -17,11 +17,11 @@ public class ExchangeRateDto {
         return id;
     }
 
-    public CurrencyEntity getBaseCurrency() {
+    public CurrencyDto getBaseCurrency() {
         return baseCurrency;
     }
 
-    public CurrencyEntity getTargetCurrency() {
+    public CurrencyDto getTargetCurrency() {
         return targetCurrency;
     }
 

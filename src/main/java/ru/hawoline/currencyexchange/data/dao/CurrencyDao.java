@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.dao.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 
@@ -9,18 +9,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyDao implements Dao<CurrencyEntity, String> {
+public class CurrencyDao implements Dao<CurrencyDto, String> {
     private Connection connection = new Connector().getConnection();
     private CurrencyEntityMapper currencyEntityMapper = new CurrencyEntityMapper();
 
     @Override
-    public List<CurrencyEntity> getAll() {
-        List<CurrencyEntity> currencies = new ArrayList<>();
+    public List<CurrencyDto> getAll() {
+        List<CurrencyDto> currencies = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM Currencies";
             try (ResultSet resultSet = statement.executeQuery(result)){
                 while (resultSet.next()) {
-                    CurrencyEntity currency = currencyEntityMapper.fromResultSet(resultSet);
+                    CurrencyDto currency = currencyEntityMapper.fromResultSet(resultSet);
                     currencies.add(currency);
                 }
             }
@@ -31,13 +31,14 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
-    public void save(CurrencyEntity currencyEntity) {
+    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) {
         String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
-                "'"+ currencyEntity.getCode() + "', " +
-                "'"+ currencyEntity.getName() + "', " +
-                "'"+ currencyEntity.getSign() + "');";
+                "'"+ currencyDtoWithoutId.getCode() + "', " +
+                "'"+ currencyDtoWithoutId.getName() + "', " +
+                "'"+ currencyDtoWithoutId.getSign() + "');";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.executeUpdate();
+            return currencyDtoWithoutId;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -45,7 +46,7 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
 
 
     @Override
-    public CurrencyEntity getById(long id) {
+    public CurrencyDto getById(long id) {
         String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyEntityMapper.fromResultSet(resultSet);
@@ -55,8 +56,8 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
-    public CurrencyEntity getBySpecification(String specification) {
-        String sql = "SELECT * FROM Currencies WHERE Code = '"+ specification +"';";
+    public CurrencyDto getBySpecification(String currencyCode) {
+        String sql = "SELECT * FROM Currencies WHERE Code = '"+ currencyCode +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyEntityMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
@@ -79,7 +80,7 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
-    public void delete(CurrencyEntity currencyEntity) {
+    public void delete(CurrencyDto currencyDto) {
 
     }
 }

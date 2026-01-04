@@ -2,7 +2,7 @@ package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateGetSpecification;
-import ru.hawoline.currencyexchange.domain.dao.entity.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
@@ -15,7 +15,27 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateGetSpec
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    public void save(ExchangeRateDto exchangeRate) {
+    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
+                Statement.RETURN_GENERATED_KEYS
+        )) {
+            preparedStatement.setInt(1, exchangeRateDto.getBaseCurrency().getId());
+            preparedStatement.setInt(2, exchangeRateDto.getTargetCurrency().getId());
+            preparedStatement.setDouble(3, exchangeRateDto.getRate());
+
+            preparedStatement.executeUpdate();
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return new ExchangeRateDto(generatedKeys.getLong(1), exchangeRateDto.getBaseCurrency(), exchangeRateDto.getTargetCurrency(), exchangeRateDto.getRate());
+                }
+                else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.domain;
 
 
-import ru.hawoline.currencyexchange.domain.dao.entity.AddExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 
 public class ExchangeRateParser {
     public AddExchangeRateDto parseRequestBody(String requestUri) {

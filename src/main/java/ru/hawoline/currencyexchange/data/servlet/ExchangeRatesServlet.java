@@ -4,13 +4,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.data.dao.ExchangeRateSqlDataSource;
-import ru.hawoline.currencyexchange.domain.dao.entity.AddExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
-import ru.hawoline.currencyexchange.domain.dao.entity.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateSqlDataSource());
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -62,7 +62,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             }
         }
         exchangeRateService.add(exchangeRateRequestBody);
-        String exchangeRateResponseString = exchangeRateService.get().toString();
+        String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(exchangeRateResponseString);
         } catch (IOException e) {

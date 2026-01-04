@@ -1,16 +1,16 @@
-package ru.hawoline.currencyexchange.domain.dao.entity;
+package ru.hawoline.currencyexchange.domain.dao.dto;
 
-public class CurrencyEntity {
+public class CurrencyDto {
     private int id;
     private String name;
     private String code;
     private String sign;
-    public CurrencyEntity(int id, String name, String code, String sign) {
+    public CurrencyDto(int id, String name, String code, String sign) {
         this(name, code, sign);
         this.id = id;
     }
 
-    public CurrencyEntity(String name, String code, String sign) {
+    public CurrencyDto(String name, String code, String sign) {
         this.name = name;
         this.code = code;
         this.sign = sign;

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.dao.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
 
 import java.io.IOException;
@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private CurrencyDao dao = new CurrencyDao();
-
+    private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -27,19 +26,19 @@ public class CurrenciesServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        List<CurrencyEntity> currencies = dao.getAll();
+        List<CurrencyDto> currencies = currencyDao.getAll();
 
         StringBuilder result = toJsonString(currencies);
         out.write(result.toString());
         out.close();
     }
 
-    private StringBuilder toJsonString(List<CurrencyEntity> currencies) {
+    private StringBuilder toJsonString(List<CurrencyDto> currencies) {
         StringBuilder result = new StringBuilder();
         result.append("[");
-        for (CurrencyEntity currencyEntity :
+        for (CurrencyDto currencyDto :
                 currencies) {
-            result.append(currencyEntity.toString()).append(",");
+            result.append(currencyDto.toString()).append(",");
         }
         // TODO убрать последнюю запятую
         result.append("]");
@@ -60,11 +59,10 @@ public class CurrenciesServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
-
-        CurrencyEntity currencyEntity = new CurrencyEntityMapper().fromXWwwFormUrlEncoded(currencyRequestString);
-        if (currencyEntity.getSign().isEmpty()
-                || currencyEntity.getName().isEmpty()
-                || currencyEntity.getCode().isEmpty()) {
+        CurrencyDto currencyDto = new CurrencyEntityMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        if (currencyDto.getSign().isEmpty()
+                || currencyDto.getName().isEmpty()
+                || currencyDto.getCode().isEmpty()) {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             } catch (IOException e) {
@@ -72,7 +70,7 @@ public class CurrenciesServlet extends HttpServlet {
             }
             return;
         }
-        if (dao.exists(currencyEntity.getCode())) {
+        if (currencyDao.exists(currencyDto.getCode())) {
             try {
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Currency with this code exists");
             } catch (IOException e) {
@@ -80,6 +78,6 @@ public class CurrenciesServlet extends HttpServlet {
             }
             return;
         }
-        dao.save(currencyEntity);
+        currencyDao.save(currencyDto);
     }
 }

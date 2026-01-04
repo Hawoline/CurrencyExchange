@@ -1,13 +1,13 @@
 package ru.hawoline.currencyexchange.data;
 
 
-import ru.hawoline.currencyexchange.domain.dao.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CurrencyEntityMapper {
-    public CurrencyEntity fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
+    public CurrencyDto fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
         String[] pairs =  wwwFormUrlEncodedCurrencyEntity.split("&");
         String name = "";
         String code = "";
@@ -32,11 +32,11 @@ public class CurrencyEntityMapper {
             throw new IllegalArgumentException("sign is wrong");
         }
 
-        return new CurrencyEntity(name, code, sign);
+        return new CurrencyDto(name, code, sign);
     }
 
-    public CurrencyEntity fromResultSet(ResultSet resultSet) throws SQLException {
-        return new CurrencyEntity(
+    public CurrencyDto fromResultSet(ResultSet resultSet) throws SQLException {
+        return new CurrencyDto(
                 resultSet.getInt("id"),
                 resultSet.getString("FullName"),
                 resultSet.getString("code"),
