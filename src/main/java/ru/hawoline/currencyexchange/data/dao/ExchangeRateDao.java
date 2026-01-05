@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateGetSpecification;
+import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateGetSpecification> {
+public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     private Connection connection = new Connector().getConnection();
     private CurrencyDao currencyDao = new CurrencyDao();
 
@@ -40,16 +40,16 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateGetSpec
     }
 
     @Override
-    public ExchangeRateDto getById(long id) {
+    public ExchangeRateDto getByLongId(long id) {
         return null;
     }
 
     @Override
-    public ExchangeRateDto getBySpecification(ExchangeRateGetSpecification specification) {
+    public ExchangeRateDto getBy(ExchangeRateId id) {
         List<ExchangeRateDto> exchangeRates = getAll();
         for (ExchangeRateDto exchangeRate: exchangeRates) {
-            boolean baseCurrencyCodeFromDbEqualsToUser = exchangeRate.getBaseCurrency().getCode().equals(specification.getBaseCurrencyCode());
-            boolean targetCurrencyCodeFromDbEqualsToUser = exchangeRate.getTargetCurrency().getCode().equals(specification.getTargetCurrencyCode());
+            boolean baseCurrencyCodeFromDbEqualsToUser = exchangeRate.getBaseCurrency().getCode().equals(id.getBaseCurrencyCode());
+            boolean targetCurrencyCodeFromDbEqualsToUser = exchangeRate.getTargetCurrency().getCode().equals(id.getTargetCurrencyCode());
             if ( baseCurrencyCodeFromDbEqualsToUser && targetCurrencyCodeFromDbEqualsToUser) {
                 return exchangeRate;
             }
@@ -62,8 +62,8 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateGetSpec
         if (!currencyDao.exists(baseCurrencyCode) || !currencyDao.exists(targetCurrencyCode)) {
             return false;
         }
-        int baseCurrencyId = currencyDao.getBySpecification(baseCurrencyCode).getId();
-        int targetCurrencyId = currencyDao.getBySpecification(targetCurrencyCode).getId();
+        int baseCurrencyId = currencyDao.getBy(baseCurrencyCode).getId();
+        int targetCurrencyId = currencyDao.getBy(targetCurrencyCode).getId();
 
         try {
             String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";
@@ -88,8 +88,8 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateGetSpec
                 while (resultSet.next()) {
                     ExchangeRateDto exchangeRateResponse = new ExchangeRateDto(
                             resultSet.getInt("ID"),
-                            currencyDao.getById(resultSet.getInt("BaseCurrencyId")),
-                            currencyDao.getById(resultSet.getInt("TargetCurrencyId")),
+                            currencyDao.getByLongId(resultSet.getInt("BaseCurrencyId")),
+                            currencyDao.getByLongId(resultSet.getInt("TargetCurrencyId")),
                             resultSet.getDouble("Rate")
                     );
                     exchangeRates.add(exchangeRateResponse);

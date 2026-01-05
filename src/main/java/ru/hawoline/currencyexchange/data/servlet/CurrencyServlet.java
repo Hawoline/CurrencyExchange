@@ -28,7 +28,7 @@ public class CurrencyServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        CurrencyDto currency = dao.getBySpecification(currencyCode);
+        CurrencyDto currency = dao.getBy(currencyCode);
         PrintWriter out = response.getWriter();
         out.write(currency.toString());
     }

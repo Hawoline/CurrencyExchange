@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateGetSpecification;
+import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class ExchangeRateServlet extends HttpServlet {
             out.close();
             return;
         }
-        ExchangeRateDto exchangeRateDto = exchangeRateDao.getBySpecification(new ExchangeRateGetSpecification(baseCurrencyCode, targetCurrencyCode));
+        ExchangeRateDto exchangeRateDto = exchangeRateDao.getBy(new ExchangeRateId(baseCurrencyCode, targetCurrencyCode));
         out.write(exchangeRateDto.toString());
         out.close();
     }

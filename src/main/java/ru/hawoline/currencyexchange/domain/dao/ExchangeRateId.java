@@ -1,10 +1,10 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-public class ExchangeRateGetSpecification {
+public class ExchangeRateId {
     private final String baseCurrencyCode;
     private final String targetCurrencyCode;
 
-    public ExchangeRateGetSpecification(String baseCurrencyCode, String targetCurrencyCode) {
+    public ExchangeRateId(String baseCurrencyCode, String targetCurrencyCode) {
         this.baseCurrencyCode = baseCurrencyCode;
         this.targetCurrencyCode = targetCurrencyCode;
     }

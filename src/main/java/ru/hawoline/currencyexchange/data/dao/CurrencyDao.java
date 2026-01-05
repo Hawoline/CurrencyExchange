@@ -46,7 +46,7 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
 
 
     @Override
-    public CurrencyDto getById(long id) {
+    public CurrencyDto getByLongId(long id) {
         String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyEntityMapper.fromResultSet(resultSet);
@@ -56,7 +56,7 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto getBySpecification(String currencyCode) {
+    public CurrencyDto getBy(String currencyCode) {
         String sql = "SELECT * FROM Currencies WHERE Code = '"+ currencyCode +"';";
         try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyEntityMapper.fromResultSet(resultSet);
