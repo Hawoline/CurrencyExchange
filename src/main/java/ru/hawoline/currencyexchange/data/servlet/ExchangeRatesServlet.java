@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
+import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
@@ -61,7 +62,17 @@ public class ExchangeRatesServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-        exchangeRateService.add(exchangeRateRequestBody);
+        try {
+            exchangeRateService.add(exchangeRateRequestBody);
+        } catch (DuplicateValueInDbException e) {
+            try {
+                response.sendError(HttpServletResponse.SC_CONFLICT, "Exchange rate exists");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return;
+        }
+
         String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
         try (PrintWriter printWriter = response.getWriter()) {
             printWriter.write(exchangeRateResponseString);

@@ -1,6 +1,7 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
+import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
@@ -15,7 +16,11 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) {
+    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException {
+        if (exists(new ExchangeRateId(exchangeRateDto.getBaseCurrency().getCode(),
+                exchangeRateDto.getTargetCurrency().getCode()))) {
+            throw new DuplicateValueInDbException();
+        }
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
@@ -58,12 +63,12 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
         throw new IllegalArgumentException("exchangeRateNotFound");
     }
 
-    public boolean exists(String baseCurrencyCode, String targetCurrencyCode) {
-        if (!currencyDao.exists(baseCurrencyCode) || !currencyDao.exists(targetCurrencyCode)) {
+    public boolean exists(ExchangeRateId exchangeRateId) {
+        if (!currencyDao.exists(exchangeRateId.getBaseCurrencyCode()) || !currencyDao.exists(exchangeRateId.getTargetCurrencyCode())) {
             return false;
         }
-        int baseCurrencyId = currencyDao.getBy(baseCurrencyCode).getId();
-        int targetCurrencyId = currencyDao.getBy(targetCurrencyCode).getId();
+        int baseCurrencyId = currencyDao.getBy(exchangeRateId.getBaseCurrencyCode()).getId();
+        int targetCurrencyId = currencyDao.getBy(exchangeRateId.getTargetCurrencyCode()).getId();
 
         try {
             String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";

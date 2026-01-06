@@ -1,5 +1,6 @@
 package ru.hawoline.currencyexchange.domain.service;
 
+import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
@@ -21,12 +22,13 @@ public class ExchangeRateService implements Service<AddExchangeRateDto, Exchange
     }
 
     @Override
-    public void add(AddExchangeRateDto addExchangeRateDto) {
+    public void add(AddExchangeRateDto addExchangeRateDto) throws DuplicateValueInDbException {
         CurrencyDto baseCurrencyDto = currencyDao.getBy(addExchangeRateDto.baseCurrencyCode());
         CurrencyDto targetCurrencyDto = currencyDao.getBy(addExchangeRateDto.targetCurrencyCode());
-        ExchangeRateDto withSavedId = exchangeRateDao.save(new ExchangeRateDto(
+        ExchangeRateDto beforeSave = new ExchangeRateDto(
                 -1, baseCurrencyDto, targetCurrencyDto, addExchangeRateDto.rate()
-        ));
+        );
+        ExchangeRateDto withSavedId = exchangeRateDao.save(beforeSave);
 
         exchangeRates.add(withSavedId);
     }
