@@ -2,6 +2,7 @@ package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
@@ -67,8 +68,18 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
         if (!currencyDao.exists(exchangeRateId.getBaseCurrencyCode()) || !currencyDao.exists(exchangeRateId.getTargetCurrencyCode())) {
             return false;
         }
-        int baseCurrencyId = currencyDao.getBy(exchangeRateId.getBaseCurrencyCode()).getId();
-        int targetCurrencyId = currencyDao.getBy(exchangeRateId.getTargetCurrencyCode()).getId();
+        int baseCurrencyId = 0;
+        try {
+            baseCurrencyId = currencyDao.getBy(exchangeRateId.getBaseCurrencyCode()).getId();
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        int targetCurrencyId = 0;
+        try {
+            targetCurrencyId = currencyDao.getBy(exchangeRateId.getTargetCurrencyCode()).getId();
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";

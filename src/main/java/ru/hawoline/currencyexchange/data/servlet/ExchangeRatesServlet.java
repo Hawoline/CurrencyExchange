@@ -7,8 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
-import ru.hawoline.currencyexchange.data.ExchangeRateRequestBodyValidator;
+import ru.hawoline.currencyexchange.data.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
+import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
@@ -44,6 +45,9 @@ public class ExchangeRatesServlet extends HttpServlet {
         out.close();
     }
 
+    /*
+    TODO: Если одна (или обе) валюта из валютной пары не существует в БД - 404
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
@@ -53,7 +57,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        boolean exchangeRateRequestBodyValid = new ExchangeRateRequestBodyValidator().validate(exchangeRateRequestBody);
+        boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
         if (!exchangeRateRequestBodyValid) {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
@@ -67,6 +71,13 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (DuplicateValueInDbException e) {
             try {
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Exchange rate exists");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            return;
+        } catch (ValueNotFoundException e) {
+            try {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db");
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

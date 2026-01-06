@@ -3,7 +3,7 @@ package ru.hawoline.currencyexchange.data;
 import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.Validator;
 
-public class ExchangeRateRequestBodyValidator implements Validator<AddExchangeRateDto> {
+public class ExchangeRateDtoValidator implements Validator<AddExchangeRateDto> {
     @Override
     public boolean validate(AddExchangeRateDto addExchangeRateDto) {
         boolean baseCurrencyCodeValid = validateCurrencyCode(addExchangeRateDto.baseCurrencyCode());
