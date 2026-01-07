@@ -71,14 +71,19 @@ public class CurrenciesServlet extends HttpServlet {
             }
             return;
         }
+        if (checkCurrencyCodeExistsInDb(response, currencyDto)) return;
+        currencyDao.save(currencyDto);
+    }
+
+    private boolean checkCurrencyCodeExistsInDb(HttpServletResponse response, CurrencyDto currencyDto) {
         if (currencyDao.exists(currencyDto.getCode())) {
             try {
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Currency with this code exists");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            return;
+            return true;
         }
-        currencyDao.save(currencyDto);
+        return false;
     }
 }

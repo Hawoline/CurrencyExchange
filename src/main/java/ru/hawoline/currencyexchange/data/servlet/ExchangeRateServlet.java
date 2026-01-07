@@ -65,7 +65,7 @@ public class ExchangeRateServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
 
     }
 }
