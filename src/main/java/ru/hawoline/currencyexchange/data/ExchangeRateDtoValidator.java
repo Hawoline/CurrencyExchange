@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.data;
 
-import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.Validator;
+import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 
 public class ExchangeRateDtoValidator implements Validator<AddExchangeRateDto> {
     @Override

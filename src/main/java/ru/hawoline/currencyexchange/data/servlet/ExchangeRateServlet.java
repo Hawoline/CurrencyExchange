@@ -14,7 +14,8 @@ import java.io.PrintWriter;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    private ExchangeRateDao  exchangeRateDao = new ExchangeRateDao();
+    private ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();

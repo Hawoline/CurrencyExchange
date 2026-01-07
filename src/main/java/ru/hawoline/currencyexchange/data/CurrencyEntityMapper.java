@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class CurrencyEntityMapper {
     public CurrencyDto fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
-        String[] pairs =  wwwFormUrlEncodedCurrencyEntity.split("&");
+        String[] pairs = wwwFormUrlEncodedCurrencyEntity.split("&");
         String name = "";
         String code = "";
         String sign = "";

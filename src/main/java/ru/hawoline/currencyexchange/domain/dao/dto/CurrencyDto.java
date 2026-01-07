@@ -5,6 +5,7 @@ public class CurrencyDto {
     private String name;
     private String code;
     private String sign;
+
     public CurrencyDto(int id, String name, String code, String sign) {
         this(name, code, sign);
         this.id = id;

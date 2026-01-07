@@ -1,10 +1,10 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
-import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
+import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
+import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
         List<CurrencyDto> currencies = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM Currencies";
-            try (ResultSet resultSet = statement.executeQuery(result)){
+            try (ResultSet resultSet = statement.executeQuery(result)) {
                 while (resultSet.next()) {
                     CurrencyDto currency = currencyEntityMapper.fromResultSet(resultSet);
                     currencies.add(currency);
@@ -34,10 +34,10 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
     @Override
     public CurrencyDto save(CurrencyDto currencyDtoWithoutId) {
         String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
-                "'"+ currencyDtoWithoutId.getCode() + "', " +
-                "'"+ currencyDtoWithoutId.getName() + "', " +
-                "'"+ currencyDtoWithoutId.getSign() + "');";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+                "'" + currencyDtoWithoutId.getCode() + "', " +
+                "'" + currencyDtoWithoutId.getName() + "', " +
+                "'" + currencyDtoWithoutId.getSign() + "');";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.executeUpdate();
             return currencyDtoWithoutId;
         } catch (SQLException e) {
@@ -48,8 +48,8 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
 
     @Override
     public CurrencyDto getByLongId(long id) {
-        String sql = "SELECT * FROM Currencies WHERE ID = '"+ id +"';";
-        try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+        String sql = "SELECT * FROM Currencies WHERE ID = '" + id + "';";
+        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyEntityMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -58,8 +58,8 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
 
     @Override
     public CurrencyDto getBy(String currencyCode) throws ValueNotFoundException {
-        String sql = "SELECT * FROM Currencies WHERE Code = '"+ currencyCode +"';";
-        try(ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+        String sql = "SELECT * FROM Currencies WHERE Code = '" + currencyCode + "';";
+        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             if (!resultSet.next()) {
                 throw new ValueNotFoundException("Currency code " + currencyCode + " does not exists in db");
             }

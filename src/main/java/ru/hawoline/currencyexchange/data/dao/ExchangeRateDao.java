@@ -3,9 +3,9 @@ package ru.hawoline.currencyexchange.data.dao;
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.dao.Dao;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,8 +34,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return new ExchangeRateDto(generatedKeys.getLong(1), exchangeRateDto.getBaseCurrency(), exchangeRateDto.getTargetCurrency(), exchangeRateDto.getRate());
-                }
-                else {
+                } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
@@ -53,10 +52,10 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     @Override
     public ExchangeRateDto getBy(ExchangeRateId id) {
         List<ExchangeRateDto> exchangeRates = getAll();
-        for (ExchangeRateDto exchangeRate: exchangeRates) {
+        for (ExchangeRateDto exchangeRate : exchangeRates) {
             boolean baseCurrencyCodeFromDbEqualsToUser = exchangeRate.getBaseCurrency().getCode().equals(id.getBaseCurrencyCode());
             boolean targetCurrencyCodeFromDbEqualsToUser = exchangeRate.getTargetCurrency().getCode().equals(id.getTargetCurrencyCode());
-            if ( baseCurrencyCodeFromDbEqualsToUser && targetCurrencyCodeFromDbEqualsToUser) {
+            if (baseCurrencyCodeFromDbEqualsToUser && targetCurrencyCodeFromDbEqualsToUser) {
                 return exchangeRate;
             }
         }

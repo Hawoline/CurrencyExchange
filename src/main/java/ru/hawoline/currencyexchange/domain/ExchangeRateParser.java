@@ -5,7 +5,7 @@ import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 
 public class ExchangeRateParser {
     public AddExchangeRateDto parseRequestBody(String requestUri) {
-        String[] pairs =  requestUri.split("&");
+        String[] pairs = requestUri.split("&");
         String baseCurrencyCode = "";
         String targetCurrencyCode = "";
         double rate = 0;
