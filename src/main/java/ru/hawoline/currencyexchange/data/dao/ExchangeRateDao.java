@@ -1,10 +1,13 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
+import ru.hawoline.currencyexchange.domain.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
+import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 
 import java.sql.*;
@@ -50,32 +53,45 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     }
 
     @Override
-    public ExchangeRateDto getBy(ExchangeRateId id) {
-        List<ExchangeRateDto> exchangeRates = getAll();
-        for (ExchangeRateDto exchangeRate : exchangeRates) {
-            boolean baseCurrencyCodeFromDbEqualsToUser = exchangeRate.getBaseCurrency().getCode().equals(id.getBaseCurrencyCode());
-            boolean targetCurrencyCodeFromDbEqualsToUser = exchangeRate.getTargetCurrency().getCode().equals(id.getTargetCurrencyCode());
-            if (baseCurrencyCodeFromDbEqualsToUser && targetCurrencyCodeFromDbEqualsToUser) {
-                return exchangeRate;
+    public ExchangeRateDto getBy(ExchangeRateId exchangeRateId) throws CurrencyNotFoundException, ExchangeRateNotFoundException {
+        CurrencyDto baseCurrencyDto = currencyDao.getBy(exchangeRateId.baseCurrencyCode());
+        CurrencyDto targetCurrencyDto = currencyDao.getBy(exchangeRateId.targetCurrencyCode());
+        int baseCurrencyId = baseCurrencyDto.getId();
+        int targetCurrencyId = targetCurrencyDto.getId();
+        String sql = "SELECT * FROM ExchangeRates WHERE BaseCurrencyId = ? AND TargetCurrencyId = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+        ) {
+            statement.setLong(1, baseCurrencyId);
+            statement.setLong(2, targetCurrencyId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new ExchangeRateNotFoundException("Exchange Rate with selected Currency Codes does not exist in Db");
+                }
+                return new ExchangeRateDto(
+                        resultSet.getLong("ID"),
+                        baseCurrencyDto,
+                        targetCurrencyDto,
+                        resultSet.getDouble("Rate")
+                );
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        throw new IllegalArgumentException("exchangeRateNotFound");
     }
 
     public boolean exists(ExchangeRateId exchangeRateId) {
-        if (!currencyDao.exists(exchangeRateId.getBaseCurrencyCode()) || !currencyDao.exists(exchangeRateId.getTargetCurrencyCode())) {
+        if (!currencyDao.exists(exchangeRateId.baseCurrencyCode()) || !currencyDao.exists(exchangeRateId.targetCurrencyCode())) {
             return false;
         }
         int baseCurrencyId = 0;
         try {
-            baseCurrencyId = currencyDao.getBy(exchangeRateId.getBaseCurrencyCode()).getId();
+            baseCurrencyId = currencyDao.getBy(exchangeRateId.baseCurrencyCode()).getId();
         } catch (ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
         int targetCurrencyId = 0;
         try {
-            targetCurrencyId = currencyDao.getBy(exchangeRateId.getTargetCurrencyCode()).getId();
+            targetCurrencyId = currencyDao.getBy(exchangeRateId.targetCurrencyCode()).getId();
         } catch (ValueNotFoundException e) {
             throw new RuntimeException(e);
         }

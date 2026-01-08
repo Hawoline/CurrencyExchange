@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
 
 import java.util.List;
 
