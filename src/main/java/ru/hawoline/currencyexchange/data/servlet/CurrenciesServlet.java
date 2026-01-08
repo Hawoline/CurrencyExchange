@@ -45,12 +45,6 @@ public class CurrenciesServlet extends HttpServlet {
         return result;
     }
 
-    // TODO fix bug {
-    //        "id": 5,
-    //        "name": "AFN",
-    //        "code": "Afghani",
-    //        "sign": "%D8%8B"
-    //    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String currencyRequestString;
