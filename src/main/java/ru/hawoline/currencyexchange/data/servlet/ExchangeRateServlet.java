@@ -4,8 +4,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
+import ru.hawoline.currencyexchange.domain.CurrencyNotFoundException;
+import ru.hawoline.currencyexchange.domain.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 
@@ -32,34 +33,30 @@ public class ExchangeRateServlet extends HttpServlet {
         String baseCurrencyCode = uri.substring(0, 3);
         String targetCurrencyCode = uri.substring(3);
 
-        boolean baseCurrencyFound = new CurrencyDao().exists(baseCurrencyCode);
-        boolean targetCurrencyFound = new CurrencyDao().exists(targetCurrencyCode);
-        PrintWriter out = null;
+        PrintWriter out;
         try {
             out = response.getWriter();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (!(baseCurrencyFound && targetCurrencyFound)) {
+        ExchangeRateDto exchangeRateDto;
+        try {
+            exchangeRateDto = exchangeRateDao.getBy(new ExchangeRateId(baseCurrencyCode, targetCurrencyCode));
+        } catch (CurrencyNotFoundException e) {
             try {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            } catch (IOException ioException) {
+                throw new RuntimeException(ioException);
             }
-            out.close();
+            return;
+        } catch (ExchangeRateNotFoundException e) {
+            try {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+            } catch (IOException ioException) {
+                throw new RuntimeException(ioException);
+            }
             return;
         }
-        boolean exchangeRatesFound = exchangeRateDao.exists(new ExchangeRateId(baseCurrencyCode, targetCurrencyCode));
-        if (!exchangeRatesFound) {
-            try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            out.close();
-            return;
-        }
-        ExchangeRateDto exchangeRateDto = exchangeRateDao.getBy(new ExchangeRateId(baseCurrencyCode, targetCurrencyCode));
         out.write(exchangeRateDto.toString());
         out.close();
     }

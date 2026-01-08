@@ -7,8 +7,11 @@ import java.util.List;
 
 public interface Dao<T, V> {
     T save(T t) throws DuplicateValueInDbException;
+
     T getByLongId(long id);
+
     T getBy(V id) throws ValueNotFoundException;
+
     List<T> getAll();
 
     void delete(T t);

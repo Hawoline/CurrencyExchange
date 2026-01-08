@@ -34,7 +34,7 @@ public class ExchangeRateDto {
 
         return "{\"id\": " + id + "," +
                 "\"baseCurrency\": " + baseCurrency.toString() + "," +
-                "\"code\": " + targetCurrency.toString() + "," +
+                "\"targetCurrency\": " + targetCurrency.toString() + "," +
                 "\"rate\": \"" + rate + "\"}";
     }
 }

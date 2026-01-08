@@ -2,7 +2,7 @@ package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 
@@ -57,11 +57,11 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto getBy(String currencyCode) throws ValueNotFoundException {
+    public CurrencyDto getBy(String currencyCode) throws CurrencyNotFoundException {
         String sql = "SELECT * FROM Currencies WHERE Code = '" + currencyCode + "';";
         try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             if (!resultSet.next()) {
-                throw new ValueNotFoundException("Currency code " + currencyCode + " does not exists in db");
+                throw new CurrencyNotFoundException(currencyCode);
             }
             return currencyEntityMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
@@ -85,6 +85,11 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
 
     @Override
     public void delete(CurrencyDto currencyDto) {
+
+    }
+
+    @Override
+    public void update(CurrencyDto currencyDto, String currencyCode) {
 
     }
 }
