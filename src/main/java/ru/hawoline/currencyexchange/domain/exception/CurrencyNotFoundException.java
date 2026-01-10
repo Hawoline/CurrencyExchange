@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.exception;
 
 public class CurrencyNotFoundException extends ValueNotFoundException {
     public CurrencyNotFoundException(String message) {

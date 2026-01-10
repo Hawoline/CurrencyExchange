@@ -1,10 +1,10 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.CurrencyNotFoundException;
-import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.ExchangeRateNotFoundException;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
@@ -59,8 +59,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
         int baseCurrencyId = baseCurrencyDto.getId();
         int targetCurrencyId = targetCurrencyDto.getId();
         String sql = "SELECT * FROM ExchangeRates WHERE BaseCurrencyId = ? AND TargetCurrencyId = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql);
-        ) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, baseCurrencyId);
             statement.setLong(2, targetCurrencyId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -96,9 +95,8 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
             throw new RuntimeException(e);
         }
 
-        try {
-            String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
             preparedStatement.setInt(1, baseCurrencyId);
             preparedStatement.setInt(2, targetCurrencyId);
             try (ResultSet rs = preparedStatement.executeQuery()) {
@@ -127,7 +125,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return exchangeRates;
     }
@@ -137,5 +135,16 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
 
     }
 
+    @Override
+    public void update(ExchangeRateDto exchangeRateDto, ExchangeRateId exchangeRateId) {
+        String sql = "UPDATE ExchangeRates SET Rate = ? WHERE ID = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setDouble(1, exchangeRateDto.getRate());
+            preparedStatement.setLong(2, exchangeRateDto.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

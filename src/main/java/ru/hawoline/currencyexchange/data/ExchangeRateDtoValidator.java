@@ -13,7 +13,7 @@ public class ExchangeRateDtoValidator implements Validator<AddExchangeRateDto> {
     }
 
     private boolean validateCurrencyCode(String targetCurrencyCode) {
-        int validCurrencyCodeLength = 3;
+        final int validCurrencyCodeLength = 3;
         return targetCurrencyCode.length() == validCurrencyCodeLength;
     }
 }

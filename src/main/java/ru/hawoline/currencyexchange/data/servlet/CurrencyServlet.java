@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 
 import java.io.IOException;

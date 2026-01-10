@@ -2,7 +2,7 @@ package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
-import ru.hawoline.currencyexchange.domain.CurrencyNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
 

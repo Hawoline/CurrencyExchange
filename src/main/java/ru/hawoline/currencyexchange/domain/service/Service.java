@@ -1,7 +1,7 @@
 package ru.hawoline.currencyexchange.domain.service;
 
-import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 
 public interface Service<T, V> {
     void add(T entity) throws DuplicateValueInDbException, ValueNotFoundException;

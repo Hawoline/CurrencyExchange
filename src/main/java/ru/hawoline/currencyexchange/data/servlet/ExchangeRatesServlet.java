@@ -7,9 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
-import ru.hawoline.currencyexchange.domain.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
@@ -45,9 +45,6 @@ public class ExchangeRatesServlet extends HttpServlet {
         out.close();
     }
 
-    /*
-    TODO: Если одна (или обе) валюта из валютной пары не существует в БД - 404
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
@@ -62,17 +59,17 @@ public class ExchangeRatesServlet extends HttpServlet {
             try {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
                 return;
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
             }
         }
         try {
             exchangeRateService.add(exchangeRateRequestBody);
         } catch (DuplicateValueInDbException e) {
             try {
-                response.sendError(HttpServletResponse.SC_CONFLICT, "Exchange rate exists");
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                response.sendError(HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate");
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
             }
             return;
         } catch (ValueNotFoundException e) {
