@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain.dao;
+package ru.hawoline.currencyexchange.domain;
 
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;

@@ -4,9 +4,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.CurrencyEntityMapper;
+import ru.hawoline.currencyexchange.data.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -54,7 +54,7 @@ public class CurrenciesServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
 
-        CurrencyDto currencyDto = new CurrencyEntityMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        CurrencyDto currencyDto = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
         if (currencyDto.getSign().isEmpty()
                 || currencyDto.getName().isEmpty()
                 || currencyDto.getCode().isEmpty()) {

@@ -5,10 +5,10 @@ import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
-import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
-import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.ExchangeRateId;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 
 import java.sql.*;
 import java.util.ArrayList;

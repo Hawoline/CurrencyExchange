@@ -1,12 +1,13 @@
 package ru.hawoline.currencyexchange.data;
 
 
-import ru.hawoline.currencyexchange.domain.dao.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Currency;
 
-public class CurrencyEntityMapper {
+public class CurrencyMapper {
     public CurrencyDto fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
         String[] pairs = wwwFormUrlEncodedCurrencyEntity.split("&");
         String name = "";
@@ -42,5 +43,9 @@ public class CurrencyEntityMapper {
                 resultSet.getString("code"),
                 resultSet.getString("sign")
         );
+    }
+
+    public Currency fromCurrencyDto(CurrencyDto currencyDto) {
+        return Currency.getInstance(currencyDto.getCode());
     }
 }

@@ -8,8 +8,8 @@ import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateId;
-import ru.hawoline.currencyexchange.domain.dao.dto.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.ExchangeRateId;
+import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.exception.RateNotFoundExceptionInRequestBody;
 
 import java.io.IOException;

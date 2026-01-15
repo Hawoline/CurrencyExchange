@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain.dao.dto;
+package ru.hawoline.currencyexchange.domain.dto;
 
 public class ExchangeRateDto {
     private final long id;
