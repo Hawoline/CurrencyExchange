@@ -7,6 +7,6 @@ public class FakeConvertedExchangeRateDto extends ConvertedExchangeRateDto {
                 new CurrencyDto(1, "Fake1", "FAK 1", "fake sign 2"),
                 2.0,
                 10,
-                20);
+                20);//
     }
 }
