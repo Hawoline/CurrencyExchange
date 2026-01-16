@@ -1,9 +1,9 @@
 package ru.hawoline.currencyexchange.domain.service;
 
-import ru.hawoline.currencyexchange.domain.Dao;
 import ru.hawoline.currencyexchange.domain.ExchangeRate;
 import ru.hawoline.currencyexchange.domain.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.ExchangeRateMapper;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dto.*;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
@@ -69,8 +69,14 @@ public class ExchangeRateService {
         } catch (ValueNotFoundException e) {
             throw new RuntimeException(e);
         }
-
-        return new FakeConvertedExchangeRateDto();
+        //TODO исправить
+        return new ConvertedExchangeRateDto(
+                new CurrencyDto("mock", "mock", "mock"),
+                new CurrencyDto("mock", "mock", "mock"),
+                1,
+                1,
+                1
+        );
     }
 
     private double convertToUsd(String currencyCode, double amount) throws ExchangeRateNotFoundException {

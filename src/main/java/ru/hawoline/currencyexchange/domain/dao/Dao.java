@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.dao;
 
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
@@ -14,7 +14,5 @@ public interface Dao<T, V> {
 
     List<T> getAll();
 
-    void delete(T object);
-
-    void update(T object, V id);
+    void update(T object, V id) throws ValueNotFoundException;
 }

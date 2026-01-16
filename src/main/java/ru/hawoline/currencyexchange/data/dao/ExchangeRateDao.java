@@ -5,7 +5,7 @@ import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
-import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.ExchangeRateId;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
@@ -128,11 +128,6 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
             e.printStackTrace();
         }
         return exchangeRates;
-    }
-
-    @Override
-    public void delete(ExchangeRateDto exchangeRate) {
-
     }
 
     @Override

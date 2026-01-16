@@ -3,7 +3,7 @@ package ru.hawoline.currencyexchange.data.dao;
 import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.CurrencyMapper;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
-import ru.hawoline.currencyexchange.domain.Dao;
+import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
 
 import java.sql.*;
@@ -81,11 +81,6 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
         } catch (SQLException e) {
             return false;
         }
-    }
-
-    @Override
-    public void delete(CurrencyDto currencyDto) {
-
     }
 
     @Override
