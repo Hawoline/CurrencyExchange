@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -66,7 +68,13 @@ public class CurrenciesServlet extends HttpServlet {
             return;
         }
         if (checkCurrencyCodeExistsInDb(response, currencyDto)) return;
-        currencyDao.save(currencyDto);
+        try {
+            currencyDao.save(currencyDto);
+        } catch (DuplicateValueInDbException e) {
+            throw new RuntimeException(e);
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean checkCurrencyCodeExistsInDb(HttpServletResponse response, CurrencyDto currencyDto) {

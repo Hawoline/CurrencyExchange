@@ -12,7 +12,7 @@ public class FakeCurrencyDao implements Dao<CurrencyDto, String> {
     private final List<CurrencyDto> currencies = new ArrayList<>();
 
     @Override
-    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) throws DuplicateValueInDbException {
+    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) throws DuplicateValueInDbException, ValueNotFoundException {
         if (exists(currencyDtoWithoutId.getCode())) {
             throw new DuplicateValueInDbException();
         }
@@ -28,8 +28,14 @@ public class FakeCurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto getByLongId(long id) {
-        return currencies.get((int) id);
+    public CurrencyDto getByLongId(long id) throws CurrencyNotFoundException {
+        CurrencyDto currencyDto;
+        try {
+            currencyDto = currencies.get((int) id);
+        } catch (IndexOutOfBoundsException e) {
+            throw new CurrencyNotFoundException("Currency does not exist in db");
+        }
+        return currencyDto;
     }
 
     @Override

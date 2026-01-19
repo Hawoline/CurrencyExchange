@@ -1,11 +1,7 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.dao;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.hawoline.currencyexchange.domain.dao.FakeCurrencyDao;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
 import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 
@@ -29,12 +25,22 @@ class FakeCurrencyDaoTest {
 
     @Test
     public void testSave() throws DuplicateValueInDbException {
-        CurrencyDto currencyDtoWithId = fakeCurrencyDao.save(firstCurrencyDtoWithoutId);
+        CurrencyDto currencyDtoWithId = null;
+        try {
+            currencyDtoWithId = fakeCurrencyDao.save(firstCurrencyDtoWithoutId);
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         int firstCurrencyId = 0;
         assertEquals(firstCurrencyId, currencyDtoWithId.getId());
 
 
-        CurrencyDto secondCurrencyDto = fakeCurrencyDao.save(secondCurrencyDtoWithoutId);
+        CurrencyDto secondCurrencyDto = null;
+        try {
+            secondCurrencyDto = fakeCurrencyDao.save(secondCurrencyDtoWithoutId);
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         int secondCurrencyId = 1;
         assertEquals(secondCurrencyId, secondCurrencyDto.getId());
 
@@ -48,14 +54,24 @@ class FakeCurrencyDaoTest {
             int unreachableRandomId = 3;
             assertEquals(unreachableRandomId, duplicated.getId());
         } catch (DuplicateValueInDbException _) {
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Test
     public void testGetByLongId() throws DuplicateValueInDbException {
         testSave();
-        assertEquals(0, fakeCurrencyDao.getByLongId(0).getId());
-        assertEquals(1, fakeCurrencyDao.getByLongId(1).getId());
+        try {
+            assertEquals(0, fakeCurrencyDao.getByLongId(0).getId());
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            assertEquals(1, fakeCurrencyDao.getByLongId(1).getId());
+        } catch (ValueNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

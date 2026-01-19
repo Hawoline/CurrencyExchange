@@ -20,7 +20,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException {
+    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException, ValueNotFoundException {
         if (exists(new ExchangeRateId(exchangeRateDto.getBaseCurrency().getCode(),
                 exchangeRateDto.getTargetCurrency().getCode()))) {
             throw new DuplicateValueInDbException();
@@ -48,7 +48,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     }
 
     @Override
-    public ExchangeRateDto getByLongId(long id) {
+    public ExchangeRateDto getByLongId(long id) throws ValueNotFoundException {
         return null;
     }
 
@@ -123,6 +123,8 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
                     );
                     exchangeRates.add(exchangeRateResponse);
                 }
+            } catch (ValueNotFoundException e) {
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             e.printStackTrace();

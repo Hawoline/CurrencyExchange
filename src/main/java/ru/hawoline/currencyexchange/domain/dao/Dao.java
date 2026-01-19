@@ -6,9 +6,9 @@ import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import java.util.List;
 
 public interface Dao<T, V> {
-    T save(T t) throws DuplicateValueInDbException;
+    T save(T t) throws DuplicateValueInDbException, ValueNotFoundException;
 
-    T getByLongId(long id);
+    T getByLongId(long id) throws ValueNotFoundException;
 
     T getBy(V id) throws ValueNotFoundException;
 

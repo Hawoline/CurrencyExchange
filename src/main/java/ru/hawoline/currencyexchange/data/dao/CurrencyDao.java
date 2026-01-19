@@ -5,6 +5,8 @@ import ru.hawoline.currencyexchange.data.CurrencyMapper;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) {
+    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) throws DuplicateValueInDbException, ValueNotFoundException {
         String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
                 "'" + currencyDtoWithoutId.getCode() + "', " +
                 "'" + currencyDtoWithoutId.getName() + "', " +
@@ -47,7 +49,7 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
 
 
     @Override
-    public CurrencyDto getByLongId(long id) {
+    public CurrencyDto getByLongId(long id) throws ValueNotFoundException {
         String sql = "SELECT * FROM Currencies WHERE ID = '" + id + "';";
         try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             return currencyMapper.fromResultSet(resultSet);
