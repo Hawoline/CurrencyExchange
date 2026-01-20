@@ -66,15 +66,6 @@ class FakeExchangeRateDaoTest {
         fakeExchangeRateDao = new FakeExchangeRateDao(fakeCurrencyDao);
     }
 
-    /*
-     * Сценарии тестирования сохранения:
-     * 1. Просто сохранить с корректными baseCurrencyId и targetCurrencyId. В этом случае все должно пройти гладко
-     * 2. Попытаться добавить ExchangeRate с дублирующимся ExchangeRateId. В этом случае вывалится ошибка
-     * 3. Попытаться добавить ExchangeRate с несуществующим baseCurrencyId в CurrencyDao. В этом случае вывалится ошибка
-     * 4. Попытаться добавить ExchangeRate с несуществующим targetCurrencyId в CurrencyDao. В этом случае вывалится ошибка
-     * 5. Попытаться добавить ExchangeRate с несуществующим baseCurrencyId и targetCurrencyId в CurrencyDao.
-     * В этом случае вывалится ошибка. Отдельный тест не нужен(смотреть пункты 4 и 5)
-     */
     @Test
     public void testSuccessSave() throws DuplicateValueInDbException, ValueNotFoundException {
         final ExchangeRateDto firstExchangeRateDtoBeforeSave = new ExchangeRateDto(
@@ -116,11 +107,6 @@ class FakeExchangeRateDaoTest {
 
     @Test
     public void testSaveDuplicatedExchangeRate() throws ValueNotFoundException {
-        /*
-            1. Test duplicated AB - AB
-            2. Don't test duplicated AB - BA, goes beyond technical task
-            3. Don't test AA!!! Because it Servlet's Validator responsibility
-         */
         final ExchangeRateDto firstExchangeRateDtoBeforeSave = new ExchangeRateDto(
                 NO_ID,
                 fakeCurrencyDao.getBy(firstCurrencyDtoWithoutId.getCode()),
