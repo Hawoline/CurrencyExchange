@@ -39,7 +39,7 @@ public class FakeCurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto getBy(String currencyCode) throws ValueNotFoundException {
+    public CurrencyDto getBy(String currencyCode) throws CurrencyNotFoundException {
         for (CurrencyDto currencyDto: currencies) {
             if (currencyDto.getCode().equals(currencyCode)) {
                 return currencyDto;
