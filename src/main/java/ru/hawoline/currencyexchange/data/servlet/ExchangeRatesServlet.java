@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {

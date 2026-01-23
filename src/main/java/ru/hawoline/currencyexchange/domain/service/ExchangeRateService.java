@@ -14,20 +14,17 @@ import java.util.List;
 
 public class ExchangeRateService {
     private Dao<ExchangeRateDto, ExchangeRateId> exchangeRateDao;
-    private Dao<CurrencyDto, String> currencyDao;
     private List<ExchangeRateDto> exchangeRates = new ArrayList<>();
     private static final String USD = "USD";
     private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
-    public ExchangeRateService(Dao<ExchangeRateDto, ExchangeRateId> exchangeRateDao,
-                               Dao<CurrencyDto, String> currencyDao) {
+    public ExchangeRateService(Dao<ExchangeRateDto, ExchangeRateId> exchangeRateDao) {
         this.exchangeRateDao = exchangeRateDao;
-        this.currencyDao = currencyDao;
     }
 
     public void add(AddExchangeRateDto addExchangeRateDto) throws DuplicateValueInDbException, ValueNotFoundException {
-        CurrencyDto baseCurrencyDto = currencyDao.getBy(addExchangeRateDto.baseCurrencyCode());
-        CurrencyDto targetCurrencyDto = currencyDao.getBy(addExchangeRateDto.targetCurrencyCode());
+        CurrencyDto baseCurrencyDto = new CurrencyDto(-1, "", addExchangeRateDto.baseCurrencyCode(), "");
+        CurrencyDto targetCurrencyDto =  new CurrencyDto(-1, "", addExchangeRateDto.targetCurrencyCode(), "");
         ExchangeRateDto beforeSave = new ExchangeRateDto(
                 -1, baseCurrencyDto, targetCurrencyDto, addExchangeRateDto.rate()
         );

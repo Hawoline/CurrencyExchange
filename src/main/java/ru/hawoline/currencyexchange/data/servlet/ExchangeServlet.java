@@ -19,10 +19,7 @@ import java.io.IOException;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(
-            new ExchangeRateDao(),
-            new CurrencyDao()
-    );
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {

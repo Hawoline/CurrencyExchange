@@ -21,22 +21,31 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
 
     @Override
     public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException, ValueNotFoundException {
-        if (exists(new ExchangeRateId(exchangeRateDto.getBaseCurrency().getCode(),
-                exchangeRateDto.getTargetCurrency().getCode()))) {
+        CurrencyDto baseCurrencyDto = currencyDao.getBy(exchangeRateDto.getBaseCurrency().getCode());
+        CurrencyDto targetCurrencyDto = currencyDao.getBy(exchangeRateDto.getTargetCurrency().getCode());
+        ExchangeRateDto filledExchangeRateDto = new ExchangeRateDto(
+                exchangeRateDto.getId(),
+                baseCurrencyDto,
+                targetCurrencyDto,
+                exchangeRateDto.getRate()
+        );
+        if (exists(new ExchangeRateId(baseCurrencyDto.getCode(), targetCurrencyDto.getCode()))) {
             throw new DuplicateValueInDbException();
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
-            preparedStatement.setInt(1, exchangeRateDto.getBaseCurrency().getId());
-            preparedStatement.setInt(2, exchangeRateDto.getTargetCurrency().getId());
-            preparedStatement.setDouble(3, exchangeRateDto.getRate());
+            int baseCurrencyId = baseCurrencyDto.getId();
+            preparedStatement.setInt(1, baseCurrencyId);
+            int targetCurrencyId = targetCurrencyDto.getId();
+            preparedStatement.setInt(2, targetCurrencyId);
+            preparedStatement.setDouble(3, filledExchangeRateDto.getRate());
 
             preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return new ExchangeRateDto(generatedKeys.getLong(1), exchangeRateDto.getBaseCurrency(), exchangeRateDto.getTargetCurrency(), exchangeRateDto.getRate());
+                    return new ExchangeRateDto(generatedKeys.getLong(1), filledExchangeRateDto.getBaseCurrency(), filledExchangeRateDto.getTargetCurrency(), filledExchangeRateDto.getRate());
                 } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
