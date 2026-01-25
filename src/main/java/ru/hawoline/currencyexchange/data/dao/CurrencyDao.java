@@ -1,29 +1,29 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.data.CurrencyMapper;
+import ru.hawoline.currencyexchange.data.CurrencySqlMapper;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrencyDao implements Dao<CurrencyDto, String> {
+public class CurrencyDao implements Dao<CurrencyEntity, String> {
     private Connection connection = new Connector().getConnection();
-    private CurrencyMapper currencyMapper = new CurrencyMapper();
+    private CurrencySqlMapper currencySqlMapper = new CurrencySqlMapper();
 
     @Override
-    public List<CurrencyDto> getAll() {
-        List<CurrencyDto> currencies = new ArrayList<>();
+    public List<CurrencyEntity> getAll() {
+        List<CurrencyEntity> currencies = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM Currencies";
             try (ResultSet resultSet = statement.executeQuery(result)) {
                 while (resultSet.next()) {
-                    CurrencyDto currency = currencyMapper.fromResultSet(resultSet);
+                    CurrencyEntity currency = currencySqlMapper.fromResultSet(resultSet);
                     currencies.add(currency);
                 }
             }
@@ -34,59 +34,60 @@ public class CurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) throws DuplicateValueInDbException, ValueNotFoundException {
-        String sql = "insert into Currencies(Code, FullName, Sign) VALUES (" +
-                "'" + currencyDtoWithoutId.getCode() + "', " +
-                "'" + currencyDtoWithoutId.getName() + "', " +
-                "'" + currencyDtoWithoutId.getSign() + "');";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+    public CurrencyEntity create(CurrencyEntity currencyEntityWithoutId) throws DuplicateEntityException {
+        String sql = "insert into Currencies(Code, FullName, Sign) VALUES (?, ?, ?);";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql,
+                Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setString(1, currencyEntityWithoutId.getCode());
+            preparedStatement.setString(2, currencyEntityWithoutId.getName());
+            preparedStatement.setString(3, currencyEntityWithoutId.getSign());
             preparedStatement.executeUpdate();
-            return currencyDtoWithoutId;
+            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedId = generatedKeys.getInt(1);
+                    return new CurrencyEntity(
+                            generatedId,
+                            currencyEntityWithoutId.getCode(),
+                            currencyEntityWithoutId.getName(),
+                            currencyEntityWithoutId.getSign()
+                    );
+                } else {
+                    throw new SQLException("Creating user failed, no ID obtained.");
+                }
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DuplicateEntityException();
         }
     }
 
-
     @Override
-    public CurrencyDto getByLongId(long id) throws ValueNotFoundException {
-        String sql = "SELECT * FROM Currencies WHERE ID = '" + id + "';";
-        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            return currencyMapper.fromResultSet(resultSet);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public CurrencyDto getBy(String currencyCode) throws CurrencyNotFoundException {
+    public CurrencyEntity getEntityById(String currencyCode) throws CurrencyNotFoundException {
         String sql = "SELECT * FROM Currencies WHERE Code = '" + currencyCode + "';";
         try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             if (!resultSet.next()) {
                 throw new CurrencyNotFoundException(currencyCode);
             }
-            return currencyMapper.fromResultSet(resultSet);
+            return currencySqlMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    public boolean exists(String code) {
-        try {
-            String sql = "SELECT EXISTS(SELECT 1 FROM Currencies WHERE code = ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, code);
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                return rs.getInt(1) == 1;
+    @Override
+    public CurrencyEntity getByIntId(int id) throws CurrencyNotFoundException {
+        String sql = "SELECT * FROM Currencies WHERE ID = '" + id + "';";
+        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+            if (!resultSet.next()) {
+                throw new CurrencyNotFoundException(String.valueOf(id));
             }
+            return currencySqlMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void update(CurrencyDto currencyDto, String currencyCode) {
+    public void update(CurrencyEntity entity) throws EntityNotFoundException {
 
     }
 }

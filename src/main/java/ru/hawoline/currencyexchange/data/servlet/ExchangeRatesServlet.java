@@ -4,14 +4,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.domain.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
 
 import java.io.IOException;
@@ -21,11 +22,10 @@ import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao());
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
         response.setContentType("application/json");
         PrintWriter out = null;
         try {
@@ -33,7 +33,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        List<ExchangeRateDto> exchangeRateEntities = exchangeRateDao.getAll();
+        List<ExchangeRateDto> exchangeRateEntities = exchangeRateService.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
         for (ExchangeRateDto exchangeRateResponse :
@@ -46,7 +46,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
         AddExchangeRateDto exchangeRateRequestBody;
         try {
@@ -63,29 +63,32 @@ public class ExchangeRatesServlet extends HttpServlet {
                 ioException.printStackTrace();
             }
         }
+        PrintWriter printWriter = response.getWriter();
         try {
             exchangeRateService.add(exchangeRateRequestBody);
-        } catch (DuplicateValueInDbException e) {
-            try {
-                response.sendError(HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate");
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+        } catch (DuplicateEntityException e) {
+            sendError(response, HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate", printWriter);
+            printWriter.close();
             return;
-        } catch (ValueNotFoundException e) {
-            try {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db");
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+        } catch (EntityNotFoundException e) {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db", printWriter);
+            printWriter.close();
             return;
         }
 
-        String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
-        try (PrintWriter printWriter = response.getWriter()) {
+        try {
+            String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
             printWriter.write(exchangeRateResponseString);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (EntityNotFoundException e) {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found after adding", printWriter);
+        } finally {
+            printWriter.close();
         }
+    }
+
+    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage, PrintWriter printWriter) {
+        response.setStatus(httpErrorCode);
+        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
+        printWriter.write(errorMessageDto.toString());
     }
 }

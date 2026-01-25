@@ -1,22 +1,22 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
 import org.junit.jupiter.api.Test;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FakeCurrencyDaoTest {
     private FakeCurrencyDao fakeCurrencyDao = new FakeCurrencyDao();
     private final int noId = -1;
-    private final CurrencyDto firstCurrencyDtoWithoutId = new CurrencyDto(
+    private final CurrencyEntity firstCurrencyEntityWithoutId = new CurrencyEntity(
             noId,
             "Dollar",
             "USD",
             "$"
     );
-    private final CurrencyDto secondCurrencyDtoWithoutId = new CurrencyDto(
+    private final CurrencyEntity secondCurrencyEntityWithoutId = new CurrencyEntity(
             noId,
             "Dollar",
             "AAA",
@@ -24,84 +24,59 @@ class FakeCurrencyDaoTest {
     );
 
     @Test
-    public void testSave() throws DuplicateValueInDbException {
-        CurrencyDto currencyDtoWithId = null;
-        try {
-            currencyDtoWithId = fakeCurrencyDao.save(firstCurrencyDtoWithoutId);
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public void testCreate() throws DuplicateEntityException {
+        CurrencyEntity currencyEntityWithId = null;
+        currencyEntityWithId = fakeCurrencyDao.create(firstCurrencyEntityWithoutId);
         int firstCurrencyId = 0;
-        assertEquals(firstCurrencyId, currencyDtoWithId.getId());
+        assertEquals(firstCurrencyId, currencyEntityWithId.getId());
 
 
-        CurrencyDto secondCurrencyDto = null;
-        try {
-            secondCurrencyDto = fakeCurrencyDao.save(secondCurrencyDtoWithoutId);
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        CurrencyEntity secondCurrencyEntity = null;
+        secondCurrencyEntity = fakeCurrencyDao.create(secondCurrencyEntityWithoutId);
         int secondCurrencyId = 1;
-        assertEquals(secondCurrencyId, secondCurrencyDto.getId());
+        assertEquals(secondCurrencyId, secondCurrencyEntity.getId());
 
-        testSaveDuplicatedCurrency(secondCurrencyDto);
+        testCreateDuplicatedCurrency(secondCurrencyEntity);
     }
 
-    private void testSaveDuplicatedCurrency(CurrencyDto toDuplicate) {
-        CurrencyDto duplicated = null;
+    private void testCreateDuplicatedCurrency(CurrencyEntity toDuplicate) {
+        CurrencyEntity duplicated = null;
         try {
-            duplicated = fakeCurrencyDao.save(toDuplicate);
+            duplicated = fakeCurrencyDao.create(toDuplicate);
             int unreachableRandomId = 3;
             assertEquals(unreachableRandomId, duplicated.getId());
-        } catch (DuplicateValueInDbException _) {
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (DuplicateEntityException _) {
         }
     }
 
     @Test
-    public void testGetByLongId() throws DuplicateValueInDbException {
-        testSave();
+    public void testGetEntityByIdLongId() throws DuplicateEntityException {
+        testCreate();
         try {
-            assertEquals(0, fakeCurrencyDao.getByLongId(0).getId());
-        } catch (ValueNotFoundException e) {
+            assertEquals(0, fakeCurrencyDao.getByIntId(0).getId());
+        } catch (EntityNotFoundException e) {
             throw new RuntimeException(e);
         }
         try {
-            assertEquals(1, fakeCurrencyDao.getByLongId(1).getId());
-        } catch (ValueNotFoundException e) {
+            assertEquals(1, fakeCurrencyDao.getByIntId(1).getId());
+        } catch (EntityNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Test
-    public void testGetBy() throws ValueNotFoundException, DuplicateValueInDbException {
-        testSave();
-        String firstCurrencyCode = firstCurrencyDtoWithoutId.getCode();
-        assertEquals(0, fakeCurrencyDao.getBy(firstCurrencyCode).getId());
-        assertEquals("USD", fakeCurrencyDao.getBy(firstCurrencyCode).getCode());
+    public void testGetEntityById() throws EntityNotFoundException, DuplicateEntityException {
+        testCreate();
+        String firstCurrencyCode = firstCurrencyEntityWithoutId.getCode();
+        assertEquals(0, fakeCurrencyDao.getEntityById(firstCurrencyCode).getId());
+        assertEquals("USD", fakeCurrencyDao.getEntityById(firstCurrencyCode).getCode());
     }
 
     @Test
-    public void testGetAll() throws DuplicateValueInDbException {
-        testSave();
+    public void testGetAll() throws DuplicateEntityException {
+        testCreate();
         int currenciesCount = 2;
         assertEquals(currenciesCount, fakeCurrencyDao.getAll().size());
     }
 
-    // Вообще по тз обновление не предусмотрено, но пусть будет. WARN: я протестил не все кейсы из-за ненадобности
-    @Test
-    public void testUpdate() throws DuplicateValueInDbException, ValueNotFoundException {
-        testSave();
-        CurrencyDto forUpdate = new CurrencyDto(
-                noId,
-                "Dollar",
-                "DAD",
-                "$"
-        );
-        fakeCurrencyDao.update(forUpdate, "USD");
-        CurrencyDto updatedCurrencyDto = fakeCurrencyDao.getBy("DAD");
-        assertEquals("DAD", updatedCurrencyDto.getCode());
-        assertEquals("$", updatedCurrencyDto.getSign());
-    }
 }

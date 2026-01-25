@@ -12,14 +12,13 @@ import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
 
 import java.io.IOException;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao());
+    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {

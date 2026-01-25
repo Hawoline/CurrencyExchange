@@ -1,18 +1,18 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 import java.util.List;
 
-public interface Dao<T, V> {
-    T save(T t) throws DuplicateValueInDbException, ValueNotFoundException;
+public interface Dao<E, K> {
+    E create(E entity) throws DuplicateEntityException;
 
-    T getByLongId(long id) throws ValueNotFoundException;
+    E getEntityById(K id) throws EntityNotFoundException;
 
-    T getBy(V id) throws ValueNotFoundException;
+    List<E> getAll();
 
-    List<T> getAll();
+    void update(E entity) throws EntityNotFoundException;
 
-    void update(T object, V id) throws ValueNotFoundException;
+    E getByIntId(int id) throws EntityNotFoundException;
 }

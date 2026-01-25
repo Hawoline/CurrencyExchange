@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,15 +25,11 @@ public class CurrencyServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if (!dao.exists(currencyCode)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        CurrencyDto currency = null;
+        CurrencyEntity currency = null;
         try {
-            currency = dao.getBy(currencyCode);
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
+            currency = dao.getEntityById(currencyCode);
+        } catch (EntityNotFoundException e) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
         PrintWriter out = response.getWriter();
         out.write(currency.toString());

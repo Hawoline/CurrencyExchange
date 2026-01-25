@@ -1,33 +1,32 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 public class FakeExchangeRateFiller {
     private final FakeExchangeRateDao fakeExchangeRateDao;
     private final FakeCurrencyDao fakeCurrencyDao;
     private static final int NO_ID = -1;
-    private final CurrencyDto firstCurrencyDtoWithoutId = new CurrencyDto(
+    private final CurrencyEntity firstCurrencyEntityWithoutId = new CurrencyEntity(
             NO_ID,
             "Dollar AAA",
             "AAA",
             "A"
     );
-    private final CurrencyDto secondCurrencyDtoWithoutId = new CurrencyDto(
+    private final CurrencyEntity secondCurrencyEntityWithoutId = new CurrencyEntity(
             NO_ID,
             "Dollar AAB",
             "AAB",
             "B"
     );
-    private final CurrencyDto thirdCurrencyDtoWithoutId = new CurrencyDto(
+    private final CurrencyEntity thirdCurrencyEntityWithoutId = new CurrencyEntity(
             NO_ID,
             "Dollar AAC",
             "AAC",
             "C"
     );
-    final CurrencyDto fourthCurrencyDtoWithoutId = new CurrencyDto(
+    final CurrencyEntity fourthCurrencyEntityWithoutId = new CurrencyEntity(
             NO_ID,
             "Dollar AAD",
             "AAD",
@@ -38,44 +37,44 @@ public class FakeExchangeRateFiller {
         this.fakeCurrencyDao = fakeCurrencyDao;
     }
 
-    public void fillCurrencies() throws ValueNotFoundException, DuplicateValueInDbException {
-        fakeCurrencyDao.save(firstCurrencyDtoWithoutId);
-        fakeCurrencyDao.save(secondCurrencyDtoWithoutId);
-        fakeCurrencyDao.save(thirdCurrencyDtoWithoutId);
-        fakeCurrencyDao.save(fourthCurrencyDtoWithoutId);
+    public void fillCurrencies() throws EntityNotFoundException, DuplicateEntityException {
+        fakeCurrencyDao.create(firstCurrencyEntityWithoutId);
+        fakeCurrencyDao.create(secondCurrencyEntityWithoutId);
+        fakeCurrencyDao.create(thirdCurrencyEntityWithoutId);
+        fakeCurrencyDao.create(fourthCurrencyEntityWithoutId);
     }
 
-    public void fillExchangeRates() throws DuplicateValueInDbException, ValueNotFoundException {
-        final ExchangeRateDto firstExchangeRateDtoBeforeSave = new ExchangeRateDto(
+    public void fillExchangeRates() throws DuplicateEntityException, EntityNotFoundException {
+        final ExchangeRateEntity firstExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getBy(firstCurrencyDtoWithoutId.getCode()),
-                fakeCurrencyDao.getBy(secondCurrencyDtoWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
                 10
         );
-        fakeExchangeRateDao.save(firstExchangeRateDtoBeforeSave);
+        fakeExchangeRateDao.create(firstExchangeRateDtoBeforeSave);
 
-        final ExchangeRateDto secondExchangeRateDtoBeforeSave = new ExchangeRateDto(
+        final ExchangeRateEntity secondExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getBy(firstCurrencyDtoWithoutId.getCode()),
-                fakeCurrencyDao.getBy(thirdCurrencyDtoWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
                 20
         );
-        fakeExchangeRateDao.save(secondExchangeRateDtoBeforeSave);
+        fakeExchangeRateDao.create(secondExchangeRateDtoBeforeSave);
 
-        final ExchangeRateDto thirdExchangeRateDtoBeforeSave = new ExchangeRateDto(
+        final ExchangeRateEntity thirdExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getBy(firstCurrencyDtoWithoutId.getCode()),
-                fakeCurrencyDao.getBy(fourthCurrencyDtoWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(fourthCurrencyEntityWithoutId.getCode()).getId(),
                 30
         );
-        fakeExchangeRateDao.save(thirdExchangeRateDtoBeforeSave);
+        fakeExchangeRateDao.create(thirdExchangeRateDtoBeforeSave);
 
-        final ExchangeRateDto fourthExchangeRateDtoBeforeSave = new ExchangeRateDto(
+        final ExchangeRateEntity fourthExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getBy(secondCurrencyDtoWithoutId.getCode()),
-                fakeCurrencyDao.getBy(thirdCurrencyDtoWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
                 40
         );
-        fakeExchangeRateDao.save(fourthExchangeRateDtoBeforeSave);
+        fakeExchangeRateDao.create(fourthExchangeRateDtoBeforeSave);
     }
 }

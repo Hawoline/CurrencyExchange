@@ -4,11 +4,11 @@ import java.util.Objects;
 
 public class ExchangeRateDto {
     private final long id;
-    private final CurrencyDto baseCurrency;
-    private final CurrencyDto targetCurrency;
+    private final CurrencyEntity baseCurrency;
+    private final CurrencyEntity targetCurrency;
     private final double rate;
 
-    public ExchangeRateDto(long id, CurrencyDto baseCurrency, CurrencyDto targetCurrency, double rate) {
+    public ExchangeRateDto(long id, CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, double rate) {
         this.id = id;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
@@ -19,11 +19,11 @@ public class ExchangeRateDto {
         return id;
     }
 
-    public CurrencyDto getBaseCurrency() {
+    public CurrencyEntity getBaseCurrency() {
         return baseCurrency;
     }
 
-    public CurrencyDto getTargetCurrency() {
+    public CurrencyEntity getTargetCurrency() {
         return targetCurrency;
     }
 

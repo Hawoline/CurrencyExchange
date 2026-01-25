@@ -1,13 +1,13 @@
 package ru.hawoline.currencyexchange.domain.dto;
 
 public class ConvertedExchangeRateDto {
-    private final CurrencyDto baseCurrency;
-    private final CurrencyDto targetCurrency;
+    private final CurrencyEntity baseCurrency;
+    private final CurrencyEntity targetCurrency;
     private final double rate;
     private final double amount;
     private final double convertedAmount;
 
-    public ConvertedExchangeRateDto(CurrencyDto baseCurrency, CurrencyDto targetCurrency, double rate, double amount, double convertedAmount) {
+    public ConvertedExchangeRateDto(CurrencyEntity baseCurrency, CurrencyEntity targetCurrency, double rate, double amount, double convertedAmount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
@@ -15,11 +15,11 @@ public class ConvertedExchangeRateDto {
         this.convertedAmount = convertedAmount;
     }
 
-    public CurrencyDto getBaseCurrency() {
+    public CurrencyEntity getBaseCurrency() {
         return baseCurrency;
     }
 
-    public CurrencyDto getTargetCurrency() {
+    public CurrencyEntity getTargetCurrency() {
         return targetCurrency;
     }
 

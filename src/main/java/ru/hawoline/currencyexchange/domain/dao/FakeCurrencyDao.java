@@ -1,48 +1,37 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FakeCurrencyDao implements Dao<CurrencyDto, String> {
-    private final List<CurrencyDto> currencies = new ArrayList<>();
+public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
+    private final List<CurrencyEntity> currencies = new ArrayList<>();
 
     @Override
-    public CurrencyDto save(CurrencyDto currencyDtoWithoutId) throws DuplicateValueInDbException, ValueNotFoundException {
-        if (exists(currencyDtoWithoutId.getCode())) {
-            throw new DuplicateValueInDbException();
+    public CurrencyEntity create(CurrencyEntity currencyEntityWithoutId) throws DuplicateEntityException {
+        if (exists(currencyEntityWithoutId.getCode())) {
+            throw new DuplicateEntityException();
         }
 
-        CurrencyDto currencyDtoWithId = new CurrencyDto(
+        CurrencyEntity currencyEntityWithId = new CurrencyEntity(
                 currencies.size(),
-                currencyDtoWithoutId.getName(),
-                currencyDtoWithoutId.getCode(),
-                currencyDtoWithoutId.getSign()
+                currencyEntityWithoutId.getName(),
+                currencyEntityWithoutId.getCode(),
+                currencyEntityWithoutId.getSign()
         );
-        currencies.add(currencyDtoWithId);
-        return currencyDtoWithId;
+        currencies.add(currencyEntityWithId);
+        return currencyEntityWithId;
     }
 
     @Override
-    public CurrencyDto getByLongId(long id) throws CurrencyNotFoundException {
-        CurrencyDto currencyDto;
-        try {
-            currencyDto = currencies.get((int) id);
-        } catch (IndexOutOfBoundsException e) {
-            throw new CurrencyNotFoundException("Currency does not exist in db");
-        }
-        return currencyDto;
-    }
-
-    @Override
-    public CurrencyDto getBy(String currencyCode) throws CurrencyNotFoundException {
-        for (CurrencyDto currencyDto: currencies) {
-            if (currencyDto.getCode().equals(currencyCode)) {
-                return currencyDto;
+    public CurrencyEntity getEntityById(String currencyCode) throws CurrencyNotFoundException {
+        for (CurrencyEntity currencyEntity : currencies) {
+            if (currencyEntity.getCode().equals(currencyCode)) {
+                return currencyEntity;
             }
         }
 
@@ -50,28 +39,33 @@ public class FakeCurrencyDao implements Dao<CurrencyDto, String> {
     }
 
     @Override
-    public List<CurrencyDto> getAll() {
+    public List<CurrencyEntity> getAll() {
         return new ArrayList<>(currencies);
     }
 
     @Override
-    public void update(CurrencyDto currencyDto, String currencyCode) throws CurrencyNotFoundException {
+    public void update(CurrencyEntity entity) throws CurrencyNotFoundException {
         int indexOfUpdatableCurrency = -1;
-        for (CurrencyDto findableCurrencyDto: currencies) {
-            if (findableCurrencyDto.getCode().equals(currencyCode)) {
-                indexOfUpdatableCurrency = findableCurrencyDto.getId();
+        for (CurrencyEntity findableCurrencyEntity : currencies) {
+            if (findableCurrencyEntity.getCode().equals(entity.getCode())) {
+                indexOfUpdatableCurrency = findableCurrencyEntity.getId();
             }
         }
         if (indexOfUpdatableCurrency == -1) {
-            String message = "Currency with same currencyCode not found while updating. Currency code: " + currencyCode;
+            String message = "Currency with same currencyCode not found while updating. Currency code: " + entity.getCode();
             throw new CurrencyNotFoundException(message);
         }
-        currencies.set(indexOfUpdatableCurrency, currencyDto);
+        currencies.set(indexOfUpdatableCurrency, entity);
+    }
+
+    @Override
+    public CurrencyEntity getByIntId(int id) throws EntityNotFoundException {
+        return currencies.get(id);
     }
 
     private boolean exists(String currencyCode) {
-        for (CurrencyDto currencyDto: currencies) {
-            if (currencyDto.getCode().equals(currencyCode)) {
+        for (CurrencyEntity currencyEntity : currencies) {
+            if (currencyEntity.getCode().equals(currencyCode)) {
                 return true;
             }
         }

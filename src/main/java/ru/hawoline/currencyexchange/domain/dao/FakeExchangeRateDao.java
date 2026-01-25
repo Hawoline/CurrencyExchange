@@ -1,43 +1,33 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.ExchangeRateId;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FakeExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
-    private final List<ExchangeRateDto> exchangeRateDtos = new ArrayList<>();
-    private final FakeCurrencyDao fakeCurrencyDao;
-
-    public FakeExchangeRateDao(FakeCurrencyDao fakeCurrencyDao) {
-        this.fakeCurrencyDao = fakeCurrencyDao;
-    }
+public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> {
+    private final List<ExchangeRateEntity> exchangeRateEntities = new ArrayList<>();
 
     @Override
-    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException, CurrencyNotFoundException {
-        CurrencyDto baseCurrencyDtoExists = fakeCurrencyDao.getByLongId(exchangeRateDto.getBaseCurrency().getId());
-        CurrencyDto targetCurrencyDtoExists = fakeCurrencyDao.getByLongId(exchangeRateDto.getTargetCurrency().getId());
-
-        if (exists(exchangeRateDto)) {
-            throw new DuplicateValueInDbException();
+    public ExchangeRateEntity create(ExchangeRateEntity exchangeRateEntity) throws DuplicateEntityException {
+        if (exists(exchangeRateEntity)) {
+            throw new DuplicateEntityException();
         }
-        ExchangeRateDto saved = new ExchangeRateDto(exchangeRateDtos.size(),
-                exchangeRateDto.getBaseCurrency(),
-                exchangeRateDto.getTargetCurrency(),
-                exchangeRateDto.getRate()
+        ExchangeRateEntity saved = new ExchangeRateEntity(exchangeRateEntities.size(),
+                exchangeRateEntity.baseCurrencyId(),
+                exchangeRateEntity.targetCurrencyId(),
+                exchangeRateEntity.rate()
         );
-        exchangeRateDtos.add(saved);
+        exchangeRateEntities.add(saved);
         return saved;
     }
 
-    private boolean exists(ExchangeRateDto exchangeRateDto) {
-        for (ExchangeRateDto exchangeRateDtoInDb: exchangeRateDtos) {
-            if (exchangeRateDto.equals(exchangeRateDtoInDb)) {
+    private boolean exists(ExchangeRateEntity exchangeRateBefore) {
+        for (ExchangeRateEntity exchangeRateEntity: exchangeRateEntities) {
+            if (exchangeRateBefore.equals(exchangeRateEntity)) {
                 return true;
             }
         }
@@ -45,39 +35,39 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId>
     }
 
     @Override
-    public ExchangeRateDto getByLongId(long id) throws ExchangeRateNotFoundException {
-        if (id < 0 || id > exchangeRateDtos.size() - 1) {
-            throw new ExchangeRateNotFoundException("Exchange rate with id " + id + " not found");
-        }
-        return exchangeRateDtos.get((int) id);
-    }
-
-    @Override
-    public ExchangeRateDto getBy(ExchangeRateId id) throws ExchangeRateNotFoundException {
-        for (ExchangeRateDto exchangeRateDto: exchangeRateDtos) {
-            if (exchangeRateDto.getBaseCurrency().getCode().equals(id.baseCurrencyCode()) &&
-                    exchangeRateDto.getTargetCurrency().getCode().equals(id.targetCurrencyCode())) {
-                return exchangeRateDto;
+    public ExchangeRateEntity getEntityById(CurrencyIdPair id) throws ExchangeRateNotFoundException {
+        for (ExchangeRateEntity exchangeRateEntity : exchangeRateEntities) {
+            if (exchangeRateEntity.baseCurrencyId() == id.baseCurrencyId() &&
+                    exchangeRateEntity.targetCurrencyId() == id.targetCurrencyCode()) {
+                return exchangeRateEntity;
             }
         }
         throw new ExchangeRateNotFoundException("Exchange rate not found");
     }
 
     @Override
-    public List<ExchangeRateDto> getAll() {
-        return new ArrayList<>(exchangeRateDtos);
+    public List<ExchangeRateEntity> getAll() {
+        return new ArrayList<>(exchangeRateEntities);
     }
 
     @Override
-    public void update(ExchangeRateDto exchangeRateDtoForUpdate, ExchangeRateId id) throws ExchangeRateNotFoundException {
-        ExchangeRateDto existing = getBy(id);
-        int index = exchangeRateDtos.indexOf(existing);
-        ExchangeRateDto onlyRateUpdated = new ExchangeRateDto(
-                existing.getId(),
-                existing.getBaseCurrency(),
-                existing.getTargetCurrency(),
-                exchangeRateDtoForUpdate.getRate()
+    public void update(ExchangeRateEntity entity) throws ExchangeRateNotFoundException {
+        int index = exchangeRateEntities.indexOf(entity);
+        ExchangeRateEntity onlyRateUpdated = new ExchangeRateEntity(
+                entity.id(),
+                entity.baseCurrencyId(),
+                entity.targetCurrencyId(),
+                entity.rate()
         );
-        exchangeRateDtos.set(index, onlyRateUpdated);
+        try {
+            exchangeRateEntities.set(index, onlyRateUpdated);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ExchangeRateNotFoundException("Exchange rate not found");
+        }
+    }
+
+    @Override
+    public ExchangeRateEntity getByIntId(int id) throws EntityNotFoundException {
+        return exchangeRateEntities.get(id);
     }
 }

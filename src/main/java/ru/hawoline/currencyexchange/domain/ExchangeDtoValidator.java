@@ -5,10 +5,10 @@ import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 public class ExchangeDtoValidator implements Validator<ExchangeDto> {
     @Override
     public boolean validate(ExchangeDto exchangeDto) {
-        if (exchangeDto.getAmount() < 0) {
+        if (exchangeDto.amount() < 0) {
             return false;
         }
-        return validateCurrencyCode(exchangeDto.getFrom()) && validateCurrencyCode(exchangeDto.getTo());
+        return validateCurrencyCode(exchangeDto.from()) && validateCurrencyCode(exchangeDto.to());
     }
 
     private boolean validateCurrencyCode(String currencyCode) {

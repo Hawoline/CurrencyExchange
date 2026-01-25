@@ -1,17 +1,17 @@
 package ru.hawoline.currencyexchange.domain.dto;
 
-public class CurrencyDto {
+public class CurrencyEntity {
     private int id;
     private String name;
     private String code;
     private String sign;
 
-    public CurrencyDto(int id, String name, String code, String sign) {
+    public CurrencyEntity(int id, String name, String code, String sign) {
         this(name, code, sign);
         this.id = id;
     }
 
-    public CurrencyDto(String name, String code, String sign) {
+    public CurrencyEntity(String name, String code, String sign) {
         this.name = name;
         this.code = code;
         this.sign = sign;

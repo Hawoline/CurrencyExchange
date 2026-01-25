@@ -4,20 +4,21 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.data.CurrencyMapper;
+import ru.hawoline.currencyexchange.domain.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
+import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
+    private ErrorSender errorSender = new ErrorSender();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -28,19 +29,19 @@ public class CurrenciesServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        List<CurrencyDto> currencies = currencyDao.getAll();
+        List<CurrencyEntity> currencies = currencyDao.getAll();
 
         StringBuilder result = toJsonString(currencies);
         out.write(result.toString());
         out.close();
     }
 
-    private StringBuilder toJsonString(List<CurrencyDto> currencies) {
+    private StringBuilder toJsonString(List<CurrencyEntity> currencies) {
         StringBuilder result = new StringBuilder();
         result.append("[");
-        for (CurrencyDto currencyDto :
+        for (CurrencyEntity currencyEntity :
                 currencies) {
-            result.append(currencyDto.toString()).append(",");
+            result.append(currencyEntity.toString()).append(",");
         }
         // TODO убрать последнюю запятую
         result.append("]");
@@ -48,44 +49,33 @@ public class CurrenciesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        String currencyRequestString;
-        try {
-            currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        CurrencyDto currencyDto = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
-        if (currencyDto.getSign().isEmpty()
-                || currencyDto.getName().isEmpty()
-                || currencyDto.getCode().isEmpty()) {
-            try {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        CurrencyEntity currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        response.setContentType("application/json");
+        response.setCharacterEncoding(StandardCharsets.UTF_8);
+        PrintWriter printWriter = response.getWriter();
+        if (currencyEntity.getSign().isEmpty()
+                || currencyEntity.getName().isEmpty()
+                || currencyEntity.getCode().isEmpty()) {
+            int errorCode = HttpServletResponse.SC_BAD_REQUEST;
+            String errorMessage = "Некоторые поля пустые";
+            errorSender.send(response, errorCode, errorMessage, printWriter);
+            printWriter.close();
             return;
         }
-        if (checkCurrencyCodeExistsInDb(response, currencyDto)) return;
         try {
-            currencyDao.save(currencyDto);
-        } catch (DuplicateValueInDbException e) {
-            throw new RuntimeException(e);
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
+            CurrencyEntity createdCurrencyEntity = currencyDao.create(currencyEntity);
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            printWriter.write(createdCurrencyEntity.toString());
+        } catch (DuplicateEntityException e) {
+            int errorCode = HttpServletResponse.SC_CONFLICT;
+            String errorMessage = "Такая валюта уже существует в базе данных";
+            errorSender.send(response, errorCode, errorMessage, printWriter);
+        } finally {
+            printWriter.close();
         }
     }
 
-    private boolean checkCurrencyCodeExistsInDb(HttpServletResponse response, CurrencyDto currencyDto) {
-        if (currencyDao.exists(currencyDto.getCode())) {
-            try {
-                response.sendError(HttpServletResponse.SC_CONFLICT, "Currency with this code exists");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return true;
-        }
-        return false;
-    }
+
 }

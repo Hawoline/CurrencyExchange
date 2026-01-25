@@ -1,72 +1,55 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
+import ru.hawoline.currencyexchange.domain.dao.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.DuplicateValueInDbException;
+import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.ValueNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.ExchangeRateId;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyDto;
-import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
+import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
+public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> {
     private Connection connection = new Connector().getConnection();
-    private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    public ExchangeRateDto save(ExchangeRateDto exchangeRateDto) throws DuplicateValueInDbException, ValueNotFoundException {
-        CurrencyDto baseCurrencyDto = currencyDao.getBy(exchangeRateDto.getBaseCurrency().getCode());
-        CurrencyDto targetCurrencyDto = currencyDao.getBy(exchangeRateDto.getTargetCurrency().getCode());
-        ExchangeRateDto filledExchangeRateDto = new ExchangeRateDto(
-                exchangeRateDto.getId(),
-                baseCurrencyDto,
-                targetCurrencyDto,
-                exchangeRateDto.getRate()
-        );
-        if (exists(new ExchangeRateId(baseCurrencyDto.getCode(), targetCurrencyDto.getCode()))) {
-            throw new DuplicateValueInDbException();
-        }
+    public ExchangeRateEntity create(ExchangeRateEntity exchangeRateEntity) throws DuplicateEntityException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
-            int baseCurrencyId = baseCurrencyDto.getId();
-            preparedStatement.setInt(1, baseCurrencyId);
-            int targetCurrencyId = targetCurrencyDto.getId();
-            preparedStatement.setInt(2, targetCurrencyId);
-            preparedStatement.setDouble(3, filledExchangeRateDto.getRate());
+            preparedStatement.setInt(1, exchangeRateEntity.baseCurrencyId());
+            preparedStatement.setInt(2, exchangeRateEntity.targetCurrencyId());
+            preparedStatement.setDouble(3, exchangeRateEntity.rate());
 
             preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    return new ExchangeRateDto(generatedKeys.getLong(1), filledExchangeRateDto.getBaseCurrency(), filledExchangeRateDto.getTargetCurrency(), filledExchangeRateDto.getRate());
+                    int generatedId = generatedKeys.getInt(1);
+                    return new ExchangeRateEntity(
+                            generatedId,
+                            exchangeRateEntity.baseCurrencyId(),
+                            exchangeRateEntity.targetCurrencyId(),
+                            exchangeRateEntity.rate()
+                    );
                 } else {
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new DuplicateEntityException();
         }
-
     }
 
     @Override
-    public ExchangeRateDto getByLongId(long id) throws ValueNotFoundException {
-        return null;
-    }
-
-    @Override
-    public ExchangeRateDto getBy(ExchangeRateId exchangeRateId) throws CurrencyNotFoundException, ExchangeRateNotFoundException {
-        CurrencyDto baseCurrencyDto = currencyDao.getBy(exchangeRateId.baseCurrencyCode());
-        CurrencyDto targetCurrencyDto = currencyDao.getBy(exchangeRateId.targetCurrencyCode());
-        int baseCurrencyId = baseCurrencyDto.getId();
-        int targetCurrencyId = targetCurrencyDto.getId();
+    public ExchangeRateEntity getEntityById(CurrencyIdPair currencyIdPair) throws ExchangeRateNotFoundException {
+        int baseCurrencyId = currencyIdPair.baseCurrencyId();
+        int targetCurrencyId = currencyIdPair.targetCurrencyCode();
         String sql = "SELECT * FROM ExchangeRates WHERE BaseCurrencyId = ? AND TargetCurrencyId = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, baseCurrencyId);
@@ -75,10 +58,10 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
                 if (!resultSet.next()) {
                     throw new ExchangeRateNotFoundException("Exchange Rate with selected Currency Codes does not exist in Db");
                 }
-                return new ExchangeRateDto(
-                        resultSet.getLong("ID"),
-                        baseCurrencyDto,
-                        targetCurrencyDto,
+                return new ExchangeRateEntity(
+                        resultSet.getInt("ID"),
+                        baseCurrencyId,
+                        targetCurrencyId,
                         resultSet.getDouble("Rate")
                 );
             }
@@ -87,53 +70,21 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
         }
     }
 
-    public boolean exists(ExchangeRateId exchangeRateId) {
-        if (!currencyDao.exists(exchangeRateId.baseCurrencyCode()) || !currencyDao.exists(exchangeRateId.targetCurrencyCode())) {
-            return false;
-        }
-        int baseCurrencyId = 0;
-        try {
-            baseCurrencyId = currencyDao.getBy(exchangeRateId.baseCurrencyCode()).getId();
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        int targetCurrencyId = 0;
-        try {
-            targetCurrencyId = currencyDao.getBy(exchangeRateId.targetCurrencyCode()).getId();
-        } catch (ValueNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        String sql = "SELECT EXISTS(SELECT 1 FROM ExchangeRates WHERE BaseCurrencyId = ? and TargetCurrencyId = ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)){
-            preparedStatement.setInt(1, baseCurrencyId);
-            preparedStatement.setInt(2, targetCurrencyId);
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                final int exchangeRateFound = 1;
-                return rs.getInt(1) == exchangeRateFound;
-            }
-        } catch (SQLException e) {
-            return false;
-        }
-    }
-
     @Override
-    public List<ExchangeRateDto> getAll() {
-        List<ExchangeRateDto> exchangeRates = new ArrayList<>();
+    public List<ExchangeRateEntity> getAll() {
+        List<ExchangeRateEntity> exchangeRates = new ArrayList<>();
         try (Statement statement = connection.createStatement()) {
             String result = "SELECT * FROM ExchangeRates";
             try (ResultSet resultSet = statement.executeQuery(result)) {
                 while (resultSet.next()) {
-                    ExchangeRateDto exchangeRateResponse = new ExchangeRateDto(
+                    ExchangeRateEntity exchangeRateResponse = new ExchangeRateEntity(
                             resultSet.getInt("ID"),
-                            currencyDao.getByLongId(resultSet.getInt("BaseCurrencyId")),
-                            currencyDao.getByLongId(resultSet.getInt("TargetCurrencyId")),
+                            resultSet.getInt("BaseCurrencyId"),
+                            resultSet.getInt("TargetCurrencyId"),
                             resultSet.getDouble("Rate")
                     );
                     exchangeRates.add(exchangeRateResponse);
                 }
-            } catch (ValueNotFoundException e) {
-                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -142,12 +93,33 @@ public class ExchangeRateDao implements Dao<ExchangeRateDto, ExchangeRateId> {
     }
 
     @Override
-    public void update(ExchangeRateDto exchangeRateDto, ExchangeRateId exchangeRateId) {
+    public void update(ExchangeRateEntity entity) {
         String sql = "UPDATE ExchangeRates SET Rate = ? WHERE ID = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setDouble(1, exchangeRateDto.getRate());
-            preparedStatement.setLong(2, exchangeRateDto.getId());
+            preparedStatement.setDouble(1, entity.rate());
+            preparedStatement.setLong(2, entity.id());
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ExchangeRateEntity getByIntId(int id) throws EntityNotFoundException {
+        String sql = "SELECT * FROM ExchangeRates WHERE ID = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new EntityNotFoundException("Exchange Rate with selected ID does not exist in Db");
+                }
+                return new ExchangeRateEntity(
+                        resultSet.getInt("ID"),
+                        resultSet.getInt("BaseCurrencyId"),
+                        resultSet.getInt("TargetCurrencyId"),
+                        resultSet.getDouble("Rate")
+                );
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
