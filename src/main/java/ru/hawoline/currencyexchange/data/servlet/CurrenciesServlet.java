@@ -4,6 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jdk.jfr.ContentType;
 import ru.hawoline.currencyexchange.domain.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
@@ -43,7 +44,6 @@ public class CurrenciesServlet extends HttpServlet {
                 currencies) {
             result.append(currencyEntity.toString()).append(",");
         }
-        // TODO убрать последнюю запятую
         result.append("]");
         return result;
     }
