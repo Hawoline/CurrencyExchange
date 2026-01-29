@@ -15,4 +15,6 @@ public interface Dao<E, K> {
     void update(E entity) throws EntityNotFoundException;
 
     E getByIntId(int id) throws EntityNotFoundException;
+
+    void delete(K id);
 }

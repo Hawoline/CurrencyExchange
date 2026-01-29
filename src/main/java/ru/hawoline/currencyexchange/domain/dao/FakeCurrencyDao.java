@@ -63,6 +63,11 @@ public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
         return currencies.get(id);
     }
 
+    @Override
+    public void delete(String id) {
+
+    }
+
     private boolean exists(String currencyCode) {
         for (CurrencyEntity currencyEntity : currencies) {
             if (currencyEntity.getCode().equals(currencyCode)) {

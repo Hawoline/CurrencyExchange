@@ -87,6 +87,17 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
+    public void delete(String id) {
+        String sql = "DELETE FROM Currencies WHERE Code = ?;";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+        @Override
     public void update(CurrencyEntity entity) throws EntityNotFoundException {
 
     }

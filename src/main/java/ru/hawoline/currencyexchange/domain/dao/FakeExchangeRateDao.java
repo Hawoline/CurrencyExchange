@@ -70,4 +70,9 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
     public ExchangeRateEntity getByIntId(int id) throws EntityNotFoundException {
         return exchangeRateEntities.get(id);
     }
+
+    @Override
+    public void delete(CurrencyIdPair id) {
+
+    }
 }

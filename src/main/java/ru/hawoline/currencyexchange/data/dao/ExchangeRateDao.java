@@ -125,4 +125,9 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
         }
     }
 
+    @Override
+    public void delete(CurrencyIdPair id) {
+        // TODO realize
+    }
+
 }
