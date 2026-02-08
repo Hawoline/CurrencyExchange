@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain.dto;
+package ru.hawoline.currencyexchange.domain.entity;
 
 public class CurrencyEntity {
     private int id;
@@ -15,6 +15,10 @@ public class CurrencyEntity {
         this.name = name;
         this.code = code;
         this.sign = sign;
+    }
+
+    public CurrencyEntity(int id) {
+        this.id = id;
     }
 
     public String getName() {

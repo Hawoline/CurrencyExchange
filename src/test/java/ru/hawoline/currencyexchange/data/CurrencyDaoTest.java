@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 

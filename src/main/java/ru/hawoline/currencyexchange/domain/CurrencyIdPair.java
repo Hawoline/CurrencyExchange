@@ -1,4 +1,6 @@
 package ru.hawoline.currencyexchange.domain;
 
-public record CurrencyIdPair(int baseCurrencyId, int targetCurrencyCode) {
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+
+public record CurrencyIdPair(CurrencyEntity baseCurrencyId, CurrencyEntity targetCurrencyCode) {
 }

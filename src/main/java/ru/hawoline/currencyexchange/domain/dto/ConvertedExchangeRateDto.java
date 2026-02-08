@@ -1,5 +1,7 @@
 package ru.hawoline.currencyexchange.domain.dto;
 
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+
 public class ConvertedExchangeRateDto {
     private final CurrencyEntity baseCurrency;
     private final CurrencyEntity targetCurrency;

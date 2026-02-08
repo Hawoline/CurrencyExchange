@@ -1,6 +1,7 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
 import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
@@ -17,8 +18,8 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
             throw new DuplicateEntityException();
         }
         ExchangeRateEntity saved = new ExchangeRateEntity(exchangeRateEntities.size(),
-                exchangeRateEntity.baseCurrencyId(),
-                exchangeRateEntity.targetCurrencyId(),
+                exchangeRateEntity.baseCurrency(),
+                exchangeRateEntity.targetCurrency(),
                 exchangeRateEntity.rate()
         );
         exchangeRateEntities.add(saved);
@@ -37,8 +38,8 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
     @Override
     public ExchangeRateEntity getEntityById(CurrencyIdPair id) throws ExchangeRateNotFoundException {
         for (ExchangeRateEntity exchangeRateEntity : exchangeRateEntities) {
-            if (exchangeRateEntity.baseCurrencyId() == id.baseCurrencyId() &&
-                    exchangeRateEntity.targetCurrencyId() == id.targetCurrencyCode()) {
+            if (exchangeRateEntity.baseCurrency() == id.baseCurrencyId() &&
+                    exchangeRateEntity.targetCurrency() == id.targetCurrencyCode()) {
                 return exchangeRateEntity;
             }
         }
@@ -55,8 +56,8 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
         int index = exchangeRateEntities.indexOf(entity);
         ExchangeRateEntity onlyRateUpdated = new ExchangeRateEntity(
                 entity.id(),
-                entity.baseCurrencyId(),
-                entity.targetCurrencyId(),
+                entity.baseCurrency(),
+                entity.targetCurrency(),
                 entity.rate()
         );
         try {

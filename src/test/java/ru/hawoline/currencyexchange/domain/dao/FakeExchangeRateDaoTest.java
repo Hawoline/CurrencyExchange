@@ -3,8 +3,8 @@ package ru.hawoline.currencyexchange.domain.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
-import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
@@ -14,7 +14,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class FakeExchangeRateDaoTest {
     private FakeExchangeRateDao fakeExchangeRateDao;
     private FakeCurrencyDao fakeCurrencyDao;
-    private static final int NO_ID = -1;
+    private final int NO_ID = -1;
+    private final int MISSING_CURRENCY_ID = -1;
+
     private final CurrencyEntity firstCurrencyEntityWithoutId = new CurrencyEntity(
             NO_ID,
             "Dollar AAA",
@@ -39,7 +41,8 @@ class FakeExchangeRateDaoTest {
             "AAD",
             "D"
     );
-    private final int MISSING_CURRENCY_ID = -1;
+    final CurrencyEntity currencyWithMissingId = new CurrencyEntity(MISSING_CURRENCY_ID);
+
 
     @BeforeEach
     public void setUp() throws DuplicateEntityException {
@@ -54,19 +57,23 @@ class FakeExchangeRateDaoTest {
 
     @Test
     public void testSuccessCreate() throws DuplicateEntityException, EntityNotFoundException {
+        CurrencyEntity firstBaseCurrencyEntityWithId = fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode());
+        CurrencyEntity secondCurrencyEntityWithId = fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode());
+
         final ExchangeRateEntity firstExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                firstBaseCurrencyEntityWithId,
+                secondCurrencyEntityWithId,
                 10
         );
         ExchangeRateEntity firstWithId = fakeExchangeRateDao.create(firstExchangeRateDtoBeforeSave);
         assertEquals(0, firstWithId.id());
 
+
         final ExchangeRateEntity secondExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
+                firstBaseCurrencyEntityWithId,
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()),
                 20
         );
         ExchangeRateEntity secondWithId = fakeExchangeRateDao.create(secondExchangeRateDtoBeforeSave);
@@ -74,8 +81,8 @@ class FakeExchangeRateDaoTest {
 
         final ExchangeRateEntity thirdExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(fourthCurrencyEntityWithoutId.getCode()).getId(),
+                firstBaseCurrencyEntityWithId,
+                fakeCurrencyDao.getEntityById(fourthCurrencyEntityWithoutId.getCode()),
                 30
         );
         ExchangeRateEntity thirdWithId = fakeExchangeRateDao.create(thirdExchangeRateDtoBeforeSave);
@@ -83,8 +90,8 @@ class FakeExchangeRateDaoTest {
 
         final ExchangeRateEntity fourthExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
+                secondCurrencyEntityWithId,
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()),
                 30
         );
         ExchangeRateEntity fourthWithId = fakeExchangeRateDao.create(fourthExchangeRateDtoBeforeSave);
@@ -95,8 +102,8 @@ class FakeExchangeRateDaoTest {
     public void testCreateDuplicatedExchangeRate() throws EntityNotFoundException {
         final ExchangeRateEntity firstExchangeRateEntityBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
         ExchangeRateEntity firstWithId = null;
@@ -116,31 +123,31 @@ class FakeExchangeRateDaoTest {
     public void testGetByExchangeRateId() throws EntityNotFoundException, DuplicateEntityException {
         final ExchangeRateEntity exchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
         ExchangeRateEntity savedExchangeRateDto = fakeExchangeRateDao.create(exchangeRateDtoBeforeSave);
 
         ExchangeRateEntity retrievedExchangeRateDto = fakeExchangeRateDao.getEntityById(new CurrencyIdPair(
-                exchangeRateDtoBeforeSave.baseCurrencyId(),
-                exchangeRateDtoBeforeSave.targetCurrencyId()
+                exchangeRateDtoBeforeSave.baseCurrency(),
+                exchangeRateDtoBeforeSave.targetCurrency()
         ));
         assertEquals(savedExchangeRateDto.id(), retrievedExchangeRateDto.id());
 
-        int savedTargetCurrencyId = savedExchangeRateDto.targetCurrencyId();
+        CurrencyEntity savedTargetCurrencyId = savedExchangeRateDto.targetCurrency();
         testGetByExchangeRateIdNotFound(new CurrencyIdPair(
-                MISSING_CURRENCY_ID,
+                currencyWithMissingId,
                 savedTargetCurrencyId
         ));
-        int savedBaseCurrencyId = savedExchangeRateDto.baseCurrencyId();
+        CurrencyEntity savedBaseCurrencyId = savedExchangeRateDto.baseCurrency();
         testGetByExchangeRateIdNotFound(new CurrencyIdPair(
                 savedBaseCurrencyId,
-                MISSING_CURRENCY_ID
+                currencyWithMissingId
         ));
         testGetByExchangeRateIdNotFound(new CurrencyIdPair(
-                MISSING_CURRENCY_ID,
-                MISSING_CURRENCY_ID
+                currencyWithMissingId,
+                currencyWithMissingId
         ));
     }
 
@@ -160,8 +167,8 @@ class FakeExchangeRateDaoTest {
     private void testGetAllAfterAddingFirstExchangeRate() throws EntityNotFoundException, DuplicateEntityException {
         final ExchangeRateEntity exchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
         ExchangeRateEntity savedExchangeRateDto = fakeExchangeRateDao.create(exchangeRateDtoBeforeSave);
@@ -175,8 +182,8 @@ class FakeExchangeRateDaoTest {
         String baseCurrencyCode = firstCurrencyEntityWithoutId.getCode();
         String targetCurrencyCode = thirdCurrencyEntityWithoutId.getCode();
 
-        int baseCurrencyId = fakeCurrencyDao.getEntityById(baseCurrencyCode).getId();
-        int targetCurrencyId = fakeCurrencyDao.getEntityById(targetCurrencyCode).getId();
+        CurrencyEntity baseCurrencyId = fakeCurrencyDao.getEntityById(baseCurrencyCode);
+        CurrencyEntity targetCurrencyId = fakeCurrencyDao.getEntityById(targetCurrencyCode);
         CurrencyIdPair updatableId = new CurrencyIdPair(baseCurrencyId, targetCurrencyId);
         final ExchangeRateEntity exchangeRateEntityBeforeSave = fakeExchangeRateDao.getEntityById(updatableId);
         final ExchangeRateEntity updatedExchangeRateDto = new ExchangeRateEntity(
@@ -196,10 +203,10 @@ class FakeExchangeRateDaoTest {
     public void testUpdateWithMissingExchangeRateId() throws EntityNotFoundException, DuplicateEntityException {
         fillFakeExchangeRateDao();
         int expectedRate = 999;
-        int targetCurrencyId = fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId();
+        CurrencyEntity targetCurrency = fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode());
         CurrencyIdPair updatableId = new CurrencyIdPair(
-                MISSING_CURRENCY_ID,
-                targetCurrencyId
+                currencyWithMissingId,
+                targetCurrency
         );
 
         CurrencyEntity missingBaseCurrencyEntity = new CurrencyEntity(
@@ -210,8 +217,8 @@ class FakeExchangeRateDaoTest {
         );
         final ExchangeRateEntity updatedExchangeRateDto = new ExchangeRateEntity(
                 NO_ID,
-                missingBaseCurrencyEntity.getId(),
-                targetCurrencyId,
+                missingBaseCurrencyEntity,
+                targetCurrency,
                 expectedRate
         );
         assertThrows(ExchangeRateNotFoundException.class, () -> {
@@ -222,32 +229,32 @@ class FakeExchangeRateDaoTest {
     private void fillFakeExchangeRateDao() throws DuplicateEntityException, EntityNotFoundException {
         final ExchangeRateEntity firstExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
         fakeExchangeRateDao.create(firstExchangeRateDtoBeforeSave);
 
         final ExchangeRateEntity secondExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()),
                 20
         );
         fakeExchangeRateDao.create(secondExchangeRateDtoBeforeSave);
 
         final ExchangeRateEntity thirdExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(fourthCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(firstCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(fourthCurrencyEntityWithoutId.getCode()),
                 30
         );
         fakeExchangeRateDao.create(thirdExchangeRateDtoBeforeSave);
 
         final ExchangeRateEntity fourthExchangeRateDtoBeforeSave = new ExchangeRateEntity(
                 NO_ID,
-                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()).getId(),
-                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()).getId(),
+                fakeCurrencyDao.getEntityById(secondCurrencyEntityWithoutId.getCode()),
+                fakeCurrencyDao.getEntityById(thirdCurrencyEntityWithoutId.getCode()),
                 40
         );
         fakeExchangeRateDao.create(fourthExchangeRateDtoBeforeSave);

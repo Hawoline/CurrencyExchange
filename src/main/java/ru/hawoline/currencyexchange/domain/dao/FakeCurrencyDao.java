@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;

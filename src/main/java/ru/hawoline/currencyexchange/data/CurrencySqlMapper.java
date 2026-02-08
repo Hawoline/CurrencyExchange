@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.data;
 
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

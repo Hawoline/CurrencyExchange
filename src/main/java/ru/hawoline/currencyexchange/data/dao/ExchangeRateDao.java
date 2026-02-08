@@ -1,8 +1,8 @@
 package ru.hawoline.currencyexchange.data.dao;
 
 import ru.hawoline.currencyexchange.data.Connector;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateEntity;
-import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
@@ -23,8 +23,11 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
                 "INSERT INTO ExchangeRates(BaseCurrencyId, TargetCurrencyId, Rate) VALUES (?, ?, ?);",
                 Statement.RETURN_GENERATED_KEYS
         )) {
-            preparedStatement.setInt(1, exchangeRateEntity.baseCurrencyId());
-            preparedStatement.setInt(2, exchangeRateEntity.targetCurrencyId());
+            int baseCurrencyId = exchangeRateEntity.baseCurrency().getId();
+            int targetCurrencyId = exchangeRateEntity.targetCurrency().getId();
+
+            preparedStatement.setInt(1, baseCurrencyId);
+            preparedStatement.setInt(2, targetCurrencyId);
             preparedStatement.setDouble(3, exchangeRateEntity.rate());
 
             preparedStatement.executeUpdate();
@@ -33,8 +36,8 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
                     int generatedId = generatedKeys.getInt(1);
                     return new ExchangeRateEntity(
                             generatedId,
-                            exchangeRateEntity.baseCurrencyId(),
-                            exchangeRateEntity.targetCurrencyId(),
+                            exchangeRateEntity.baseCurrency(),
+                            exchangeRateEntity.targetCurrency(),
                             exchangeRateEntity.rate()
                     );
                 } else {
@@ -48,20 +51,22 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
 
     @Override
     public ExchangeRateEntity getEntityById(CurrencyIdPair currencyIdPair) throws ExchangeRateNotFoundException {
-        int baseCurrencyId = currencyIdPair.baseCurrencyId();
-        int targetCurrencyId = currencyIdPair.targetCurrencyCode();
+        CurrencyEntity currencyEntity = currencyIdPair.baseCurrencyId();
+        CurrencyEntity targetCurrency = currencyIdPair.targetCurrencyCode();
         String sql = "SELECT * FROM ExchangeRates WHERE BaseCurrencyId = ? AND TargetCurrencyId = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, baseCurrencyId);
-            statement.setLong(2, targetCurrencyId);
+            statement.setLong(1, currencyEntity.getId());
+            statement.setLong(2, targetCurrency.getId());
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
                     throw new ExchangeRateNotFoundException("Exchange Rate with selected Currency Codes does not exist in Db");
                 }
+
+
                 return new ExchangeRateEntity(
                         resultSet.getInt("ID"),
-                        baseCurrencyId,
-                        targetCurrencyId,
+                        currencyEntity,
+                        targetCurrency,
                         resultSet.getDouble("Rate")
                 );
             }
@@ -77,10 +82,26 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
             String result = "SELECT * FROM ExchangeRates";
             try (ResultSet resultSet = statement.executeQuery(result)) {
                 while (resultSet.next()) {
+                    int baseCurrencyId = resultSet.getInt("BaseCurrencyId");
+                    int targetCurrencyId = resultSet.getInt("TargetCurrencyId");
+
+                    CurrencyEntity baseCurrencyEntity = new CurrencyEntity(
+                            baseCurrencyId,
+                            "",
+                            "",
+                            ""
+                    );
+                    CurrencyEntity targetCurrencyEntity = new CurrencyEntity(
+                            targetCurrencyId,
+                            "",
+                            "",
+                            ""
+                    );
+
                     ExchangeRateEntity exchangeRateResponse = new ExchangeRateEntity(
                             resultSet.getInt("ID"),
-                            resultSet.getInt("BaseCurrencyId"),
-                            resultSet.getInt("TargetCurrencyId"),
+                            baseCurrencyEntity,
+                            targetCurrencyEntity,
                             resultSet.getDouble("Rate")
                     );
                     exchangeRates.add(exchangeRateResponse);
@@ -113,10 +134,14 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> 
                 if (!resultSet.next()) {
                     throw new EntityNotFoundException("Exchange Rate with selected ID does not exist in Db");
                 }
+
+                int baseCurrencyId = resultSet.getInt("BaseCurrencyId");
+                CurrencyEntity baseCurrencyEntity = new CurrencyEntity(baseCurrencyId);
+                CurrencyEntity targetCurrencyEntity = new CurrencyEntity(id);
                 return new ExchangeRateEntity(
                         resultSet.getInt("ID"),
-                        resultSet.getInt("BaseCurrencyId"),
-                        resultSet.getInt("TargetCurrencyId"),
+                        baseCurrencyEntity,
+                        targetCurrencyEntity,
                         resultSet.getDouble("Rate")
                 );
             }

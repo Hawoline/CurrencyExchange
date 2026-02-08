@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
 import java.util.Currency;
 

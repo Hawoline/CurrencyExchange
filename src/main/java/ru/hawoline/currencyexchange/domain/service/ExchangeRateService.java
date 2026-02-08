@@ -4,7 +4,8 @@ import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
 import ru.hawoline.currencyexchange.domain.ExchangeRate;
 import ru.hawoline.currencyexchange.domain.ExchangeRateMapper;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.dto.*;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
@@ -30,7 +31,7 @@ public class ExchangeRateService {
         CurrencyEntity baseCurrencyEntity = currencyDao.getEntityById(addExchangeRateDto.baseCurrencyCode());
         CurrencyEntity targetCurrencyEntity = currencyDao.getEntityById(addExchangeRateDto.targetCurrencyCode());
         ExchangeRateEntity beforeSave = new ExchangeRateEntity(
-                -1, baseCurrencyEntity.getId(), targetCurrencyEntity.getId(), addExchangeRateDto.rate()
+                -1, baseCurrencyEntity, targetCurrencyEntity, addExchangeRateDto.rate()
         );
         ExchangeRateEntity withSavedId = exchangeRateDao.create(beforeSave);
 
@@ -40,8 +41,8 @@ public class ExchangeRateService {
     public ExchangeRateDto getLastAdded() throws EntityNotFoundException {
         ExchangeRateEntity last = exchangeRates.getLast();
         return exchangeRateMapper.toExchangeRateDto(last,
-                currencyDao.getByIntId(last.baseCurrencyId()),
-                currencyDao.getByIntId(last.targetCurrencyId())
+                currencyDao.getByIntId(last.baseCurrency().getId()),
+                currencyDao.getByIntId(last.targetCurrency().getId())
         );
     }
 
@@ -58,7 +59,7 @@ public class ExchangeRateService {
         int targetCurrencyEntityId = targetCurrencyEntity.getId();
         try {
             ExchangeRateEntity exchangeRateEntity = exchangeRateDao.getEntityById(new CurrencyIdPair(
-                    baseCurrencyEntityId, targetCurrencyEntityId)
+                    baseCurrencyEntity, targetCurrencyEntity)
             );
             ExchangeRateDto exchangeRateDto = new ExchangeRateDto(
                     exchangeRateEntity.id(),
@@ -73,8 +74,8 @@ public class ExchangeRateService {
 
         }
         try {
-            ExchangeRateEntity exchangeRateEntity = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntityId,
-                    baseCurrencyEntityId));
+            ExchangeRateEntity exchangeRateEntity = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntity,
+                    baseCurrencyEntity));
             ExchangeRateDto exchangeRateDto = new ExchangeRateDto(
                     exchangeRateEntity.id(),
                     baseCurrencyEntity,
@@ -90,11 +91,10 @@ public class ExchangeRateService {
         }
         try {
             CurrencyEntity dollarEntity = currencyDao.getEntityById(USD);
-            int dollarId = dollarEntity.getId();
-            ExchangeRateEntity fromUsdToFrom = exchangeRateDao.getEntityById(new CurrencyIdPair(dollarId, baseCurrencyEntityId));
-            ExchangeRateEntity fromFromToUsd = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntityId, dollarId));
-            ExchangeRateEntity fromUsdToTo = exchangeRateDao.getEntityById(new CurrencyIdPair(dollarId, targetCurrencyEntityId));
-            ExchangeRateEntity fromToToUsd = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntityId, dollarId));
+            ExchangeRateEntity fromUsdToFrom = exchangeRateDao.getEntityById(new CurrencyIdPair(dollarEntity, baseCurrencyEntity));
+            ExchangeRateEntity fromFromToUsd = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntity, dollarEntity));
+            ExchangeRateEntity fromUsdToTo = exchangeRateDao.getEntityById(new CurrencyIdPair(dollarEntity, targetCurrencyEntity));
+            ExchangeRateEntity fromToToUsd = exchangeRateDao.getEntityById(new CurrencyIdPair(targetCurrencyEntity, dollarEntity));
         } catch (EntityNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -115,10 +115,10 @@ public class ExchangeRateService {
             CurrencyEntity targetCurrencyEntity;
             List<CurrencyEntity> currencyEntities = currencyDao.getAll();
             baseCurrencyEntity = currencyEntities.stream().filter(
-                    currencyEntity -> currencyEntity.getId() == exchangeRateEntity.baseCurrencyId()
+                    currencyEntity -> currencyEntity.getId() == exchangeRateEntity.baseCurrency().getId()
             ).findFirst().orElseThrow();
             targetCurrencyEntity = currencyEntities.stream().filter(
-                    currencyEntity -> currencyEntity.getId() == exchangeRateEntity.targetCurrencyId()
+                    currencyEntity -> currencyEntity.getId() == exchangeRateEntity.targetCurrency().getId()
             ).findFirst().orElseThrow();
             return new ExchangeRateDto(
                     exchangeRateEntity.id(),

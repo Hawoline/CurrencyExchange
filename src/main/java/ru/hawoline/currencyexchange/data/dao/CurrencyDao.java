@@ -4,7 +4,7 @@ import ru.hawoline.currencyexchange.data.Connector;
 import ru.hawoline.currencyexchange.data.CurrencySqlMapper;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 

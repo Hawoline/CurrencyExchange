@@ -1,8 +1,8 @@
 package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.domain.dao.ExchangeRateEntity;
+import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.dto.CurrencyEntity;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 

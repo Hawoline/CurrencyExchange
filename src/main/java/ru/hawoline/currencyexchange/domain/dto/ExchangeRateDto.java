@@ -1,5 +1,7 @@
 package ru.hawoline.currencyexchange.domain.dto;
 
+import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
+
 import java.util.Objects;
 
 public class ExchangeRateDto {
