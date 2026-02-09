@@ -39,12 +39,20 @@ public class CurrenciesServlet extends HttpServlet {
     private StringBuilder toJsonString(List<CurrencyEntity> currencies) {
         StringBuilder result = new StringBuilder();
         result.append("[");
+        String comma = ",";
         for (CurrencyEntity currencyEntity :
                 currencies) {
-            result.append(currencyEntity.toString()).append(",");
+            result.append(currencyEntity.toString()).append(comma);
         }
+        removeLastComma(result, comma);
+
         result.append("]");
         return result;
+    }
+
+    private void removeLastComma(StringBuilder result, String comma) {
+        int lastIndexOfComma = result.lastIndexOf(comma);
+        result.deleteCharAt(lastIndexOfComma);
     }
 
     @Override
