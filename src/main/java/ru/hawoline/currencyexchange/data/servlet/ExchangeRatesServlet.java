@@ -36,13 +36,20 @@ public class ExchangeRatesServlet extends HttpServlet {
         List<ExchangeRateDto> exchangeRateEntities = exchangeRateService.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
+        String comma = ",";
         for (ExchangeRateDto exchangeRateResponse :
                 exchangeRateEntities) {
-            result.append(exchangeRateResponse.toString()).append(",");
+            result.append(exchangeRateResponse.toString()).append(comma);
         }
+        removeLastComma(result, comma);
         result.append("]");
         out.write(result.toString());
         out.close();
+    }
+
+    private void removeLastComma(StringBuilder result, String comma) {
+        int lastIndexOfComma = result.lastIndexOf(comma);
+        result.deleteCharAt(lastIndexOfComma);
     }
 
     @Override

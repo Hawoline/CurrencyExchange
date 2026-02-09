@@ -9,6 +9,15 @@ GET http://localhost:8080/currencies
 GET http://localhost:8080/currency/ASD
 
 ###
+# @name currencies
+POST http://localhost:8080/currencies
+Content-Type: application/x-www-form-urlencoded
+
+name = "AAB name" &
+code = AAB &
+sign = A
+
+###
 # @name exchangeRates
 GET http://localhost:8080/exchangeRates
 
@@ -20,15 +29,6 @@ Content-Type: application/x-www-form-urlencoded
 baseCurrencyCode = AFN &
 targetCurrencyCode = AOA &
 rate = 0.1
-
-###
-# @name currencies
-POST http://localhost:8080/currencies
-Content-Type: application/x-www-form-urlencoded
-
-name = "AAB name" &
-code = AAB &
-sign = A
 
 ###
 # @name updateExchangeRate
