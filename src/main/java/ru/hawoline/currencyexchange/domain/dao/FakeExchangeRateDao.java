@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
+import ru.hawoline.currencyexchange.domain.CurrencyPair;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
@@ -9,13 +9,13 @@ import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundExcepti
 import java.util.ArrayList;
 import java.util.List;
 
-public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPair> {
+public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair> {
     private final List<ExchangeRateEntity> exchangeRateEntities = new ArrayList<>();
 
     @Override
     public ExchangeRateEntity create(ExchangeRateEntity exchangeRateEntity) throws DuplicateEntityException {
         if (exists(exchangeRateEntity)) {
-            throw new DuplicateEntityException();
+            throw new DuplicateEntityException("Exchange Rate with " + exchangeRateEntity + " already exists.");
         }
         ExchangeRateEntity saved = new ExchangeRateEntity(exchangeRateEntities.size(),
                 exchangeRateEntity.baseCurrency(),
@@ -36,7 +36,7 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
     }
 
     @Override
-    public ExchangeRateEntity getEntityById(CurrencyIdPair id) throws ExchangeRateNotFoundException {
+    public ExchangeRateEntity getEntityBy(CurrencyPair id) throws ExchangeRateNotFoundException {
         for (ExchangeRateEntity exchangeRateEntity : exchangeRateEntities) {
             if (exchangeRateEntity.baseCurrency() == id.baseCurrencyId() &&
                     exchangeRateEntity.targetCurrency() == id.targetCurrencyCode()) {
@@ -73,7 +73,7 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyIdPa
     }
 
     @Override
-    public void delete(CurrencyIdPair id) {
+    public void delete(CurrencyPair id) {
 
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 public interface Dao<E, K> {
     E create(E entity) throws DuplicateEntityException;
 
-    E getEntityById(K id) throws EntityNotFoundException;
+    E getEntityBy(K id) throws EntityNotFoundException;
 
     List<E> getAll();
 

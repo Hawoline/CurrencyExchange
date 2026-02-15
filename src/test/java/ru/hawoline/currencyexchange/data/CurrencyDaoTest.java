@@ -51,7 +51,7 @@ class CurrencyDaoTest {
     }
 
     @Test
-    public void testGetEntityByIdLongId() {
+    public void testGetEntityByIdLong() {
         try {
             assertEquals(1, fakeCurrencyDao.getByIntId(1).getId());
         } catch (EntityNotFoundException e) {
@@ -65,9 +65,9 @@ class CurrencyDaoTest {
     }
 
     @Test
-    public void testGetEntityById() throws EntityNotFoundException {
+    public void testGetEntityBy() throws EntityNotFoundException {
         String firstCurrencyWithoutIdCode = firstCurrencyEntityWithoutId.getCode();
-        CurrencyEntity firstCurrencyEntity = fakeCurrencyDao.getEntityById(firstCurrencyWithoutIdCode);
+        CurrencyEntity firstCurrencyEntity = fakeCurrencyDao.getEntityBy(firstCurrencyWithoutIdCode);
         int firstCurrencyId = firstCurrencyEntity.getId();
         assertTrue(0 < firstCurrencyId);
 

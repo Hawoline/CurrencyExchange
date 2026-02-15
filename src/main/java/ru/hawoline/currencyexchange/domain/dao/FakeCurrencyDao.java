@@ -14,7 +14,7 @@ public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
     @Override
     public CurrencyEntity create(CurrencyEntity currencyEntityWithoutId) throws DuplicateEntityException {
         if (exists(currencyEntityWithoutId.getCode())) {
-            throw new DuplicateEntityException();
+            throw new DuplicateEntityException("Currency with code " + currencyEntityWithoutId.getCode() + " already exists.");
         }
 
         CurrencyEntity currencyEntityWithId = new CurrencyEntity(
@@ -28,7 +28,7 @@ public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
-    public CurrencyEntity getEntityById(String currencyCode) throws CurrencyNotFoundException {
+    public CurrencyEntity getEntityBy(String currencyCode) throws CurrencyNotFoundException {
         for (CurrencyEntity currencyEntity : currencies) {
             if (currencyEntity.getCode().equals(currencyCode)) {
                 return currencyEntity;

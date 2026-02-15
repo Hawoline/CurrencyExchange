@@ -27,7 +27,7 @@ public class CurrencyServlet extends HttpServlet {
         }
         CurrencyEntity currency = null;
         try {
-            currency = dao.getEntityById(currencyCode);
+            currency = dao.getEntityBy(currencyCode);
         } catch (EntityNotFoundException e) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }

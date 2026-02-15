@@ -56,12 +56,12 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
                 }
             }
         } catch (SQLException e) {
-            throw new DuplicateEntityException();
+            throw new DuplicateEntityException("Currency with code " + currencyEntityWithoutId.getCode() + " already exists.");
         }
     }
 
     @Override
-    public CurrencyEntity getEntityById(String currencyCode) throws CurrencyNotFoundException {
+    public CurrencyEntity getEntityBy(String currencyCode) throws CurrencyNotFoundException {
         String sql = "SELECT * FROM Currencies WHERE Code = '" + currencyCode + "';";
         try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
             if (!resultSet.next()) {

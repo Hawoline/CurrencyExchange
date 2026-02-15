@@ -26,7 +26,7 @@ public class ExchangeRate {
     }
 
     public double exchangeToTarget(double baseAmount) {
-        return baseAmount * rate;
+        return rate * baseAmount;
     }
 
     public double exchangeToBase(double targetAmount, int roundingTo) {

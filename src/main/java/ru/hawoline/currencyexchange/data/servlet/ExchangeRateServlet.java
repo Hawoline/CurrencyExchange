@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.CurrencyIdPair;
-import ru.hawoline.currencyexchange.domain.ExchangeRateMapper;
+import ru.hawoline.currencyexchange.domain.CurrencyPair;
+import ru.hawoline.currencyexchange.domain.mapper.ExchangeRateMapper;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
@@ -43,9 +43,9 @@ public class ExchangeRateServlet extends HttpServlet {
         CurrencyEntity baseCurrencyEntity;
         CurrencyEntity targetCurrencyEntity;
         try {
-            baseCurrencyEntity = currencyDao.getEntityById(baseCurrencyCode);
-            targetCurrencyEntity = currencyDao.getEntityById(targetCurrencyCode);
-            exchangeRateEntity = exchangeRateDao.getEntityById(new CurrencyIdPair(baseCurrencyEntity, targetCurrencyEntity));
+            baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
+            targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
+            exchangeRateEntity = exchangeRateDao.getEntityBy(new CurrencyPair(baseCurrencyEntity, targetCurrencyEntity));
         } catch (CurrencyNotFoundException e) {
             errorSender.send(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage(), response.getWriter());
             return;
@@ -74,17 +74,17 @@ public class ExchangeRateServlet extends HttpServlet {
         CurrencyEntity baseCurrencyEntity;
         CurrencyEntity targetCurrencyEntity;
         try {
-            baseCurrencyEntity = currencyDao.getEntityById(baseCurrencyCode);
-            targetCurrencyEntity = currencyDao.getEntityById(targetCurrencyCode);
+            baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
+            targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
         } catch (CurrencyNotFoundException e) {
             errorSender.send(response, HttpServletResponse.SC_NOT_FOUND, "Base or Target Currency Code not found", response.getWriter());
             return;
         }
 
-        CurrencyIdPair currencyPair = new CurrencyIdPair(baseCurrencyEntity, targetCurrencyEntity);
+        CurrencyPair currencyPair = new CurrencyPair(baseCurrencyEntity, targetCurrencyEntity);
         ExchangeRateEntity exchangeRateEntityBeforeUpdate;
         try {
-            exchangeRateEntityBeforeUpdate = exchangeRateDao.getEntityById(currencyPair);
+            exchangeRateEntityBeforeUpdate = exchangeRateDao.getEntityBy(currencyPair);
         } catch (ExchangeRateNotFoundException e) {
             String exchangeRateNotExistsMessage = "Exchange Rate with this Codes does not exists";
             response.sendError(HttpServletResponse.SC_NOT_FOUND, exchangeRateNotExistsMessage);

@@ -1,4 +1,4 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.mapper;
 
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 

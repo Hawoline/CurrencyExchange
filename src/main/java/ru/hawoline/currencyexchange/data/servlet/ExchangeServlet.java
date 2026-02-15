@@ -7,7 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.ExchangeDtoValidator;
+import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
+import ru.hawoline.currencyexchange.domain.validator.ExchangeDtoValidator;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
@@ -40,7 +41,7 @@ public class ExchangeServlet extends HttpServlet {
         }
         try {
             ConvertedExchangeRateDto convertedExchangeRateDto = exchangeRateService.convert(exchangeDto);
-        } catch (ExchangeRateNotFoundException e) {
+        } catch (EntityNotFoundException e) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("message", "Base currency or target currency or exchange rate with these currencies not found");
             try {

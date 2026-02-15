@@ -1,5 +1,6 @@
-package ru.hawoline.currencyexchange.domain;
+package ru.hawoline.currencyexchange.domain.validator;
 
+import ru.hawoline.currencyexchange.domain.Validator;
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
 
 public class ExchangeRateDtoValidator implements Validator<AddExchangeRateDto> {
