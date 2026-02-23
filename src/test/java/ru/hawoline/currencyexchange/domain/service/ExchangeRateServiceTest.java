@@ -2,9 +2,10 @@ package ru.hawoline.currencyexchange.domain.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 import ru.hawoline.currencyexchange.domain.dao.FakeCurrencyDao;
 import ru.hawoline.currencyexchange.domain.dao.FakeExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.dao.FakeExchangeRateFiller;
+import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
@@ -16,18 +17,39 @@ class ExchangeRateServiceTest {
     private final FakeCurrencyDao fakeCurrencyDao = new FakeCurrencyDao();
     private final FakeExchangeRateDao fakeExchangeRateDao = new FakeExchangeRateDao();
     private final ExchangeRateService exchangeRateService = new ExchangeRateService(fakeExchangeRateDao, fakeCurrencyDao);
-    private FakeExchangeRateFiller fakeExchangeRateFiller = new FakeExchangeRateFiller(fakeExchangeRateDao, fakeCurrencyDao);
 
+    //TODO finish filling exchangeRateService
     @BeforeEach
     public void setUp() throws EntityNotFoundException, DuplicateEntityException {
-        fakeExchangeRateFiller.fillCurrencies();
-        fakeExchangeRateFiller.fillExchangeRates();
+        fakeExchangeRateDao.removeAll();
+        fillDirectRates();
+//        fillReverseRates();
+        fillCrossRates();
+    }
+
+    private void fillCrossRates() {
+//        fillDirectCrossRates();
+        fillReverseCrossRates();
+    }
+
+    private void fillReverseCrossRates() {
+
+    }
+
+    private void fillDirectRates() throws DuplicateEntityException, EntityNotFoundException {
+        exchangeRateService.add(new AddExchangeRateDto("EUR", "ALL", 2));
     }
 
     @Test
     public void testConvertDirectRate() throws EntityNotFoundException {
         ConvertedExchangeRateDto converted = exchangeRateService.convert(new ExchangeDto("EUR", "ALL", 5));
         assertEquals(50, converted.convertedAmount());
+    }
+
+    @Test
+    public void testConvertZeroAmount() throws EntityNotFoundException {
+        ConvertedExchangeRateDto zero = exchangeRateService.convert(new ExchangeDto("EUR", "ALL", 0));
+        assertEquals(0, zero.convertedAmount());
     }
 
     @Test

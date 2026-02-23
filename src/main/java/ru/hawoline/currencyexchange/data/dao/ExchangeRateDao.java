@@ -7,14 +7,14 @@ import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 import ru.hawoline.currencyexchange.domain.dao.Dao;
-import ru.hawoline.currencyexchange.domain.CurrencyPair;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair> {
+public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPairEntity> {
     private Connection connection = new Connector().getConnection();
 
     @Override
@@ -50,9 +50,9 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair> {
     }
 
     @Override
-    public ExchangeRateEntity getEntityBy(CurrencyPair currencyPair) throws ExchangeRateNotFoundException {
-        CurrencyEntity currencyEntity = currencyPair.baseCurrencyId();
-        CurrencyEntity targetCurrency = currencyPair.targetCurrencyCode();
+    public ExchangeRateEntity getEntityBy(CurrencyPairEntity currencyPairEntity) throws ExchangeRateNotFoundException {
+        CurrencyEntity currencyEntity = currencyPairEntity.base();
+        CurrencyEntity targetCurrency = currencyPairEntity.target();
         String sql = "SELECT * FROM ExchangeRates WHERE BaseCurrencyId = ? AND TargetCurrencyId = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, currencyEntity.getId());
@@ -151,7 +151,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair> {
     }
 
     @Override
-    public void delete(CurrencyPair id) {
+    public void delete(CurrencyPairEntity id) {
         // TODO realize
     }
 

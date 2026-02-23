@@ -3,7 +3,7 @@ package ru.hawoline.currencyexchange.domain;
 
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
-import ru.hawoline.currencyexchange.domain.exception.RateNotFoundExceptionInRequestBody;
+import ru.hawoline.currencyexchange.domain.exception.RateNotFoundInRequestBodyException;
 
 public class ExchangeRateParser {
     public AddExchangeRateDto parseRequestBody(String requestUri) {
@@ -25,10 +25,10 @@ public class ExchangeRateParser {
         return new AddExchangeRateDto(baseCurrencyCode, targetCurrencyCode, rate);
     }
 
-    public double parseRateFromRequestBody(String requestUri) throws RateNotFoundExceptionInRequestBody {
+    public double parseRateFromRequestBody(String requestUri) throws RateNotFoundInRequestBodyException {
         String[] pair = requestUri.split("=");
         if (pair.length < 2) {
-            throw new RateNotFoundExceptionInRequestBody("Parameter \"rate\" not found in Request Body");
+            throw new RateNotFoundInRequestBodyException("Parameter \"rate\" not found in Request Body");
         }
         return Double.parseDouble(pair[1]);
     }

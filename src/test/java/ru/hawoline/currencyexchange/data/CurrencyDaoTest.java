@@ -33,8 +33,7 @@ class CurrencyDaoTest {
     }
 
     public void testCreate() throws DuplicateEntityException {
-        CurrencyEntity currencyEntityWithId = null;
-        currencyEntityWithId = fakeCurrencyDao.create(firstCurrencyEntityWithoutId);
+        CurrencyEntity currencyEntityWithId = fakeCurrencyDao.create(firstCurrencyEntityWithoutId);
         int firstCurrencyId = currencyEntityWithId.getId();
         assertTrue(0 < firstCurrencyId);
 

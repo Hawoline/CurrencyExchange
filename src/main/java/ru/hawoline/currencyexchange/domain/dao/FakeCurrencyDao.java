@@ -35,7 +35,7 @@ public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
             }
         }
 
-        throw new CurrencyNotFoundException("Currency not found");
+        throw new CurrencyNotFoundException(currencyCode);
     }
 
     @Override

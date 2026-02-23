@@ -13,7 +13,7 @@ import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
-import ru.hawoline.currencyexchange.domain.service.ExchangeRateService;
+import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 
 import java.io.IOException;
 import java.io.PrintWriter;

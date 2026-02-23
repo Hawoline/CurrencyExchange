@@ -1,6 +1,5 @@
-package ru.hawoline.currencyexchange.domain.mapper;
+package ru.hawoline.currencyexchange.domain;
 
-import ru.hawoline.currencyexchange.domain.ExchangeRate;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
@@ -13,19 +12,19 @@ public class ExchangeRateMapper {
 
     public ExchangeRate fromExchangeRateDto(ExchangeRateDto exchangeRateDto) {
         return new ExchangeRate(
-                currencyMapper.fromCurrencyDto(exchangeRateDto.getBaseCurrency()),
-                currencyMapper.fromCurrencyDto(exchangeRateDto.getTargetCurrency()),
+                currencyMapper.fromEntityToModel(exchangeRateDto.getBaseCurrency()),
+                currencyMapper.fromEntityToModel(exchangeRateDto.getTargetCurrency()),
                 exchangeRateDto.getRate()
         );
     }
 
-    public ConvertedExchangeRateDto toConvertedExchangeRateDto(double amount, ExchangeRateDto exchangeRateDto, double convertedAmount) {
+    public ConvertedExchangeRateDto toConvertedExchangeRateDto(double amount, ConvertedExchangeRate convertedExchangeRate) {
         return new ConvertedExchangeRateDto(
-                exchangeRateDto.getBaseCurrency(),
-                exchangeRateDto.getTargetCurrency(),
-                exchangeRateDto.getRate(),
+                currencyMapper.fromModelToEntity(convertedExchangeRate.base()),
+                currencyMapper.fromModelToEntity(convertedExchangeRate.target()),
+                convertedExchangeRate.rate(),
                 amount,
-                convertedAmount
+                convertedExchangeRate.targetAmount()
         );
     }
 

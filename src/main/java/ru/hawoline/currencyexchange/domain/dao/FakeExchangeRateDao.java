@@ -1,6 +1,6 @@
 package ru.hawoline.currencyexchange.domain.dao;
 
-import ru.hawoline.currencyexchange.domain.CurrencyPair;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
@@ -9,7 +9,7 @@ import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundExcepti
 import java.util.ArrayList;
 import java.util.List;
 
-public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair> {
+public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPairEntity> {
     private final List<ExchangeRateEntity> exchangeRateEntities = new ArrayList<>();
 
     @Override
@@ -36,10 +36,10 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair
     }
 
     @Override
-    public ExchangeRateEntity getEntityBy(CurrencyPair id) throws ExchangeRateNotFoundException {
+    public ExchangeRateEntity getEntityBy(CurrencyPairEntity id) throws ExchangeRateNotFoundException {
         for (ExchangeRateEntity exchangeRateEntity : exchangeRateEntities) {
-            if (exchangeRateEntity.baseCurrency() == id.baseCurrencyId() &&
-                    exchangeRateEntity.targetCurrency() == id.targetCurrencyCode()) {
+            if (exchangeRateEntity.baseCurrency() == id.base() &&
+                    exchangeRateEntity.targetCurrency() == id.target()) {
                 return exchangeRateEntity;
             }
         }
@@ -73,7 +73,11 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair
     }
 
     @Override
-    public void delete(CurrencyPair id) {
+    public void delete(CurrencyPairEntity id) {
 
+    }
+
+    public void removeAll() {
+        exchangeRateEntities.clear();
     }
 }

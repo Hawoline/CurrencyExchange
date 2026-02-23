@@ -2,7 +2,7 @@ package ru.hawoline.currencyexchange.domain.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.hawoline.currencyexchange.domain.CurrencyPair;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
@@ -129,31 +129,31 @@ class FakeExchangeRateDaoTest {
         );
         ExchangeRateEntity savedExchangeRateDto = fakeExchangeRateDao.create(exchangeRateDtoBeforeSave);
 
-        ExchangeRateEntity retrievedExchangeRateDto = fakeExchangeRateDao.getEntityBy(new CurrencyPair(
+        ExchangeRateEntity retrievedExchangeRateDto = fakeExchangeRateDao.getEntityBy(new CurrencyPairEntity(
                 exchangeRateDtoBeforeSave.baseCurrency(),
                 exchangeRateDtoBeforeSave.targetCurrency()
         ));
         assertEquals(savedExchangeRateDto.id(), retrievedExchangeRateDto.id());
 
         CurrencyEntity savedTargetCurrencyId = savedExchangeRateDto.targetCurrency();
-        testGetByExchangeRateIdNotFound(new CurrencyPair(
+        testGetByExchangeRateIdNotFound(new CurrencyPairEntity(
                 currencyWithMissingId,
                 savedTargetCurrencyId
         ));
         CurrencyEntity savedBaseCurrencyId = savedExchangeRateDto.baseCurrency();
-        testGetByExchangeRateIdNotFound(new CurrencyPair(
+        testGetByExchangeRateIdNotFound(new CurrencyPairEntity(
                 savedBaseCurrencyId,
                 currencyWithMissingId
         ));
-        testGetByExchangeRateIdNotFound(new CurrencyPair(
+        testGetByExchangeRateIdNotFound(new CurrencyPairEntity(
                 currencyWithMissingId,
                 currencyWithMissingId
         ));
     }
 
-    private void testGetByExchangeRateIdNotFound(CurrencyPair currencyPair) {
+    private void testGetByExchangeRateIdNotFound(CurrencyPairEntity currencyPairEntity) {
         assertThrows(EntityNotFoundException.class, () -> {
-            ExchangeRateEntity errorDto = fakeExchangeRateDao.getEntityBy(currencyPair);
+            ExchangeRateEntity errorDto = fakeExchangeRateDao.getEntityBy(currencyPairEntity);
         });
     }
 
@@ -184,7 +184,7 @@ class FakeExchangeRateDaoTest {
 
         CurrencyEntity baseCurrencyId = fakeCurrencyDao.getEntityBy(baseCurrencyCode);
         CurrencyEntity targetCurrencyId = fakeCurrencyDao.getEntityBy(targetCurrencyCode);
-        CurrencyPair updatableId = new CurrencyPair(baseCurrencyId, targetCurrencyId);
+        CurrencyPairEntity updatableId = new CurrencyPairEntity(baseCurrencyId, targetCurrencyId);
         final ExchangeRateEntity exchangeRateEntityBeforeSave = fakeExchangeRateDao.getEntityBy(updatableId);
         final ExchangeRateEntity updatedExchangeRateDto = new ExchangeRateEntity(
                 exchangeRateEntityBeforeSave.id(),

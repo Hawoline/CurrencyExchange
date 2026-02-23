@@ -4,7 +4,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.domain.mapper.CurrencyMapper;
+import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
+import ru.hawoline.currencyexchange.domain.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
-    private ErrorSender errorSender = new ErrorSender();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -67,7 +67,7 @@ public class CurrenciesServlet extends HttpServlet {
                 || currencyEntity.getCode().isEmpty()) {
             int errorCode = HttpServletResponse.SC_BAD_REQUEST;
             String errorMessage = "Некоторые поля пустые";
-            errorSender.send(response, errorCode, errorMessage, printWriter);
+            sendError(response, errorCode, errorMessage);
             printWriter.close();
             return;
         }
@@ -78,10 +78,16 @@ public class CurrenciesServlet extends HttpServlet {
         } catch (DuplicateEntityException e) {
             int errorCode = HttpServletResponse.SC_CONFLICT;
             String errorMessage = "Такая валюта уже существует в базе данных";
-            errorSender.send(response, errorCode, errorMessage, printWriter);
+            sendError(response, errorCode, errorMessage);
         } finally {
             printWriter.close();
         }
+    }
+
+    public void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
+        response.setStatus(httpErrorCode);
+        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
+        response.getWriter().write(errorMessageDto.toString());
     }
 
 

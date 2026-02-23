@@ -45,7 +45,7 @@ Content-Type: application/x-www-form-urlencoded
 rate = 8
 
 ###
-# @name exchange
+# @name exchangeDirectRate
 GET http://localhost:8080/exchange?
     from=AFN&
     to=ALL&
@@ -53,3 +53,33 @@ GET http://localhost:8080/exchange?
 Content-Type: application/x-www-form-urlencoded
 
 rate = 6
+
+###
+# @name exhangeReverseRate
+GET http://localhost:8080/exchange?
+    from=ALL&
+    to=AFN&
+    amount=10
+Content-Type: application/x-www-form-urlencoded
+
+###
+# @name exhangeCrossDirectRate
+GET http://localhost:8080/exchange?
+    from=ALL&
+    to=EUR&
+    amount=10
+Content-Type: application/x-www-form-urlencoded
+###
+# @name exhangeCrossRateWhereDollarInTargets
+GET http://localhost:8080/exchange?
+    from=ALL&
+    to=AUD&
+    amount=5
+Content-Type: application/x-www-form-urlencoded
+###
+# @name exhangeCrossRateWhereDollarInBases
+GET http://localhost:8080/exchange?
+    from=DZD&
+    to=AWG&
+    amount=5
+Content-Type: application/x-www-form-urlencoded

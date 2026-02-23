@@ -1,8 +1,9 @@
-package ru.hawoline.currencyexchange.domain.mapper;
+package ru.hawoline.currencyexchange.domain;
 
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
 import java.util.Currency;
+import java.util.Locale;
 
 public class CurrencyMapper {
     public CurrencyEntity fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
@@ -33,9 +34,11 @@ public class CurrencyMapper {
         return new CurrencyEntity(name, code, sign);
     }
 
-
-
-    public Currency fromCurrencyDto(CurrencyEntity currencyEntity) {
+    public Currency fromEntityToModel(CurrencyEntity currencyEntity) {
         return Currency.getInstance(currencyEntity.getCode());
+    }
+
+    public CurrencyEntity fromModelToEntity(Currency currency) {
+        return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol());
     }
 }

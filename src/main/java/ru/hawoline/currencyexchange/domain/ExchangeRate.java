@@ -3,34 +3,28 @@ package ru.hawoline.currencyexchange.domain;
 import java.util.Currency;
 
 public class ExchangeRate {
-    private final Currency baseCurrency;
-    private final Currency targetCurrency;
+    private final Currency base;
+    private final Currency target;
     private double rate;
 
-    public ExchangeRate(Currency baseCurrency, Currency targetCurrency, double rate) {
-        this.baseCurrency = baseCurrency;
-        this.targetCurrency = targetCurrency;
+    public ExchangeRate(Currency base, Currency target, double rate) {
+        this.base = base;
+        this.target = target;
         this.rate = rate;
-    }
-
-    public Currency getBaseCurrency() {
-        return baseCurrency;
-    }
-
-    public Currency getTargetCurrency() {
-        return targetCurrency;
     }
 
     public double getRate() {
         return rate;
     }
 
-    public double exchangeToTarget(double baseAmount) {
-        return rate * baseAmount;
+    public ConvertedExchangeRate exchangeToTarget(double baseAmount) {
+        double targetAmount = rate * baseAmount;
+        return new ConvertedExchangeRate(base, target, rate, targetAmount);
     }
 
-    public double exchangeToBase(double targetAmount, int roundingTo) {
-        return roundAvoid(targetAmount / rate, roundingTo);
+    public ConvertedExchangeRate exchangeToBase(double targetAmount) {
+        double baseAmount = roundAvoid(targetAmount / rate, base.getDefaultFractionDigits());
+        return new ConvertedExchangeRate(target, base, 1 / rate, baseAmount);
     }
 
     private double roundAvoid(double value, int places) {
