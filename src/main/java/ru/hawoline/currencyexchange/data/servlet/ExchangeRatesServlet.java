@@ -27,6 +27,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("application/json");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
         PrintWriter out = null;
         try {
             out = response.getWriter();
