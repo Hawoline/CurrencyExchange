@@ -21,11 +21,11 @@ public class CurrenciesServlet extends HttpServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        resp.setContentType("application/json");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        response.setContentType("application/json");
         PrintWriter out;
         try {
-            out = resp.getWriter();
+            out = response.getWriter();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

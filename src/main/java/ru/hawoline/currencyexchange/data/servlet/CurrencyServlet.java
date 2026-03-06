@@ -18,7 +18,7 @@ public class CurrencyServlet extends HttpServlet {
 
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
         String currencyCode = uri.replaceAll("/currency/", "");
         if (currencyCode.contains("/")) {
