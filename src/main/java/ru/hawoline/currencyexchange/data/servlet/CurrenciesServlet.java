@@ -22,6 +22,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
         response.setContentType("application/json");
         PrintWriter out;
         try {
