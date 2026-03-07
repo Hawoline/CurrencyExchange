@@ -27,9 +27,14 @@ public class ExchangeRateServlet extends HttpServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
     private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
+    // TODO добавить CORS заголовки
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
+        response.setContentType("application/json");
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
         uri = uri.replaceAll("/exchangeRate/", "");
         if (uri.contains("/")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -62,6 +67,12 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        response.setHeader("Access-Control-Allow-Methods", "PATCH");
+        response.setHeader("Accept-Patch", "");
+        response.setContentType("application/json");
+
         String uri = request.getRequestURI();
         uri = uri.replaceAll("/exchangeRate/", "");
         if (uri.contains("/")) {

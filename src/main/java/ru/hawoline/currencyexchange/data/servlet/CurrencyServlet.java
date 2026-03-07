@@ -16,7 +16,7 @@ import java.io.PrintWriter;
 public class CurrencyServlet extends HttpServlet {
     private CurrencyDao dao = new CurrencyDao();
 
-
+    // TODO добавить CORS заголовки
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();

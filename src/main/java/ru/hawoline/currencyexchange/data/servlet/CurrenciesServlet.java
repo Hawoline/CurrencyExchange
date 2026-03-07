@@ -56,6 +56,7 @@ public class CurrenciesServlet extends HttpServlet {
         result.deleteCharAt(lastIndexOfComma);
     }
 
+    // TODO добавить CORS заголовки
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));

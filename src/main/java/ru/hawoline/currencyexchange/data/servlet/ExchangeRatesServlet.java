@@ -53,6 +53,7 @@ public class ExchangeRatesServlet extends HttpServlet {
         result.deleteCharAt(lastIndexOfComma);
     }
 
+    // TODO добавить CORS заголовки
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();

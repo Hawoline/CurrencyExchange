@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 public class ExchangeServlet extends HttpServlet {
     private final ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
+    // TODO добавить CORS заголовки
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String queryString = request.getQueryString();
