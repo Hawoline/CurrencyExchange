@@ -14,6 +14,9 @@ public class CurrencyMapper {
         for (String pairString : pairs) {
             String[] pair = pairString.split("=");
             String key = pair[0];
+            if (pair.length < 2) {
+                throw new IllegalArgumentException(key + " is empty");
+            }
             String value = pair[1];
             switch (key) {
                 case "name" -> name = value;

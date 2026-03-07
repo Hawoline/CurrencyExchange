@@ -56,12 +56,20 @@ public class CurrenciesServlet extends HttpServlet {
         result.deleteCharAt(lastIndexOfComma);
     }
 
-    // TODO добавить CORS заголовки
+    // TODO Пробел заменяется плюсиком - исправить, и в бд тоже
+    // TODO Пример: AAD	AAD+Name	AAD
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        CurrencyEntity currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
         response.setContentType("application/json");
+        CurrencyEntity currencyEntity;
+        try {
+            currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+        } catch (IllegalArgumentException exception) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
+            return;
+        }
         response.setCharacterEncoding(StandardCharsets.UTF_8);
         PrintWriter printWriter = response.getWriter();
         if (currencyEntity.getSign().isEmpty()
