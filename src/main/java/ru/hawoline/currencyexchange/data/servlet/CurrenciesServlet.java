@@ -78,7 +78,7 @@ public class CurrenciesServlet extends HttpServlet {
         }
     }
 
-    public void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
+    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
         response.setStatus(httpErrorCode);
         ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
         response.getWriter().write(errorMessageDto.toString());

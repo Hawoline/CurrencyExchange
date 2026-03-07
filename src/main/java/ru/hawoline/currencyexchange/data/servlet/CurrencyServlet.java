@@ -20,19 +20,16 @@ public class CurrencyServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding(StandardCharsets.UTF_8);
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+        addResponseHeaders(response);
         String uri = request.getRequestURI();
         String currencyCode = uri.replaceAll("/currency/", "");
         if (currencyCode.contains("/")) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Uri path contains unnecessary '/'");
             return;
         }
-        CurrencyEntity currency;
         PrintWriter out = response.getWriter();
         try {
-            currency = dao.getEntityBy(currencyCode);
+            CurrencyEntity currency = dao.getEntityBy(currencyCode);
             out.write(currency.toString());
         } catch (EntityNotFoundException e) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
@@ -41,7 +38,13 @@ public class CurrencyServlet extends HttpServlet {
         }
     }
 
-    public void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
+    private void addResponseHeaders(HttpServletResponse response) {
+        response.setContentType("application/json");
+        response.setCharacterEncoding(StandardCharsets.UTF_8);
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+    }
+
+    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
         response.setStatus(httpErrorCode);
         ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
         response.getWriter().write(errorMessageDto.toString());
