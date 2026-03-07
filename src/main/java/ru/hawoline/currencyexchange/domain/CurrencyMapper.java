@@ -1,40 +1,28 @@
 package ru.hawoline.currencyexchange.domain;
 
+import ru.hawoline.currencyexchange.data.servlet.QueryParameterParser;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
-import java.util.Currency;
-import java.util.Locale;
+import java.util.*;
 
 public class CurrencyMapper {
-    public CurrencyEntity fromXWwwFormUrlEncoded(String wwwFormUrlEncodedCurrencyEntity) {
-        String[] pairs = wwwFormUrlEncodedCurrencyEntity.split("&");
-        String name = "";
-        String code = "";
-        String sign = "";
-        for (String pairString : pairs) {
-            String[] pair = pairString.split("=");
-            String key = pair[0];
-            if (pair.length < 2) {
-                throw new IllegalArgumentException(key + " is empty");
-            }
-            String value = pair[1];
-            switch (key) {
-                case "name" -> name = value;
-                case "code" -> code = value;
-                case "sign" -> sign = value;
-            }
+    public CurrencyEntity fromQueryToCurrencyEntity(String query) {
+        QueryParameterParser queryParameterParser = new QueryParameterParser();
+        Map<String, List<String>> parsed = queryParameterParser.parseQueryParameters(query);
+        String code = parsed.get("code").getFirst();
+        String name = parsed.get("name").getFirst();
+        String sign = parsed.get("sign").getFirst();
+        if (code.isEmpty()) {
+            throw new IllegalArgumentException("code is empty");
         }
         if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is wrong");
-        }
-        if (code.isEmpty()) {
-            throw new IllegalArgumentException("code is wrong");
+            throw new IllegalArgumentException("name is empty");
         }
         if (sign.isEmpty()) {
-            throw new IllegalArgumentException("sign is wrong");
+            throw new IllegalArgumentException("sign is empty");
         }
 
-        return new CurrencyEntity(name, code, sign);
+        return new CurrencyEntity(sign, code, sign);
     }
 
     public Currency fromEntityToModel(CurrencyEntity currencyEntity) {

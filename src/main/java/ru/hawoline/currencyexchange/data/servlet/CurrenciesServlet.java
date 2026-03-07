@@ -56,8 +56,6 @@ public class CurrenciesServlet extends HttpServlet {
         result.deleteCharAt(lastIndexOfComma);
     }
 
-    // TODO Пробел заменяется плюсиком - исправить, и в бд тоже
-    // TODO Пример: AAD	AAD+Name	AAD
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
@@ -65,7 +63,7 @@ public class CurrenciesServlet extends HttpServlet {
         response.setContentType("application/json");
         CurrencyEntity currencyEntity;
         try {
-            currencyEntity = new CurrencyMapper().fromXWwwFormUrlEncoded(currencyRequestString);
+            currencyEntity = new CurrencyMapper().fromQueryToCurrencyEntity(currencyRequestString);
         } catch (IllegalArgumentException exception) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
             return;
