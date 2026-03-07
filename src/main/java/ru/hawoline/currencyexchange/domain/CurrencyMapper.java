@@ -10,22 +10,9 @@ public class CurrencyMapper {
         QueryParameterParser queryParameterParser = new QueryParameterParser();
         Map<String, List<String>> parsed = queryParameterParser.parseQueryParameters(query);
         String code = parsed.get("code").getFirst();
-        String name = parsed.get("name").getFirst();
-        String sign = parsed.get("sign").getFirst();
-        if (code.isEmpty()) {
-            throw new IllegalArgumentException("code is empty");
-        }
-        if (code.length() != 3) {
-            throw new IllegalArgumentException("Code length must be 3 symbols");
-        }
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("name is empty");
-        }
-        if (sign.isEmpty()) {
-            throw new IllegalArgumentException("sign is empty");
-        }
+        Currency currency = Currency.getInstance(code);
 
-        return new CurrencyEntity(sign, code, sign);
+        return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol(Locale.ENGLISH));
     }
 
     public Currency fromEntityToModel(CurrencyEntity currencyEntity) {
