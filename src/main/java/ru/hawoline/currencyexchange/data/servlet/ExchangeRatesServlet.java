@@ -1,7 +1,6 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
@@ -9,7 +8,6 @@ import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.validator.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
@@ -21,13 +19,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRates")
-public class ExchangeRatesServlet extends HttpServlet {
+public class ExchangeRatesServlet extends CustomServlet {
     private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
+        addResponseHeaders(response);
         PrintWriter out = null;
         try {
             out = response.getWriter();
@@ -53,9 +50,9 @@ public class ExchangeRatesServlet extends HttpServlet {
         result.deleteCharAt(lastIndexOfComma);
     }
 
-    // TODO добавить CORS заголовки
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        addResponseHeaders(response);
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
         AddExchangeRateDto exchangeRateRequestBody;
         try {
@@ -76,11 +73,11 @@ public class ExchangeRatesServlet extends HttpServlet {
         try {
             exchangeRateService.add(exchangeRateRequestBody);
         } catch (DuplicateEntityException e) {
-            sendError(response, HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate", printWriter);
+            sendError(response, HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate");
             printWriter.close();
             return;
         } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db", printWriter);
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db");
             printWriter.close();
             return;
         }
@@ -89,15 +86,9 @@ public class ExchangeRatesServlet extends HttpServlet {
             String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
             printWriter.write(exchangeRateResponseString);
         } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found after adding", printWriter);
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found after adding");
         } finally {
             printWriter.close();
         }
-    }
-
-    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage, PrintWriter printWriter) {
-        response.setStatus(httpErrorCode);
-        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
-        printWriter.write(errorMessageDto.toString());
     }
 }

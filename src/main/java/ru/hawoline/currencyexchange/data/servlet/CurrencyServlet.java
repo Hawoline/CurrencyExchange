@@ -1,12 +1,9 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
-import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
@@ -15,7 +12,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 @WebServlet(value = "/currency/*")
-public class CurrencyServlet extends HttpServlet {
+public class CurrencyServlet extends CustomServlet {
     private CurrencyDao dao = new CurrencyDao();
 
     @Override
@@ -36,17 +33,5 @@ public class CurrencyServlet extends HttpServlet {
         } finally {
             out.close();
         }
-    }
-
-    private void addResponseHeaders(HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setCharacterEncoding(StandardCharsets.UTF_8);
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
-    }
-
-    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
-        response.setStatus(httpErrorCode);
-        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
-        response.getWriter().write(errorMessageDto.toString());
     }
 }

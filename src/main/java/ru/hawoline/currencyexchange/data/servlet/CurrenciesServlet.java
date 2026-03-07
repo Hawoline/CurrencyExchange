@@ -1,10 +1,8 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.CurrencyMapper;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
@@ -17,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
-public class CurrenciesServlet extends HttpServlet {
+public class CurrenciesServlet extends CustomServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
-        response.setContentType("application/json");
+        addResponseHeaders(response);
         PrintWriter out;
         try {
             out = response.getWriter();
@@ -59,9 +56,7 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
-        response.setContentType("application/json");
-        response.setCharacterEncoding(StandardCharsets.UTF_8);
+        addResponseHeaders(response);
         CurrencyEntity currencyEntity;
         PrintWriter printWriter = response.getWriter();
         try {
@@ -77,12 +72,4 @@ public class CurrenciesServlet extends HttpServlet {
             printWriter.close();
         }
     }
-
-    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
-        response.setStatus(httpErrorCode);
-        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
-        response.getWriter().write(errorMessageDto.toString());
-    }
-
-
 }

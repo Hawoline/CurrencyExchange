@@ -1,14 +1,12 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
-import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
@@ -22,7 +20,7 @@ import java.io.PrintWriter;
 import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
-public class ExchangeRateServlet extends HttpServlet {
+public class ExchangeRateServlet extends CustomServlet {
     private ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
     private CurrencyDao currencyDao = new CurrencyDao();
     private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
@@ -31,10 +29,7 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
-        response.setContentType("application/json");
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
+        addResponseHeaders(response);
         uri = uri.replaceAll("/exchangeRate/", "");
         if (uri.contains("/")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -67,12 +62,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        response.setHeader("Access-Control-Allow-Methods", "PATCH");
-        response.setHeader("Accept-Patch", "");
-        response.setContentType("application/json");
-
+        addResponseHeaders(response);
         String uri = request.getRequestURI();
         uri = uri.replaceAll("/exchangeRate/", "");
         if (uri.contains("/")) {
@@ -126,12 +116,6 @@ public class ExchangeRateServlet extends HttpServlet {
                 baseCurrencyEntity,
                 targetCurrencyEntity)
         );
-    }
-
-    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
-        response.setStatus(httpErrorCode);
-        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
-        response.getWriter().write(errorMessageDto.toString());
     }
 
     private void sendResponse(HttpServletResponse response, ExchangeRateDto exchangeRateDto) throws IOException {

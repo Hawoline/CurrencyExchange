@@ -1,14 +1,12 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.dto.ConvertedExchangeRateDto;
-import ru.hawoline.currencyexchange.domain.dto.ErrorMessageDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateService;
@@ -18,12 +16,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet("/exchange")
-public class ExchangeServlet extends HttpServlet {
+public class ExchangeServlet extends CustomServlet {
     private final ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
-    // TODO добавить CORS заголовки
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        addResponseHeaders(response);
         String queryString = request.getQueryString();
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
         ExchangeDto exchangeDto = exchangeRateParser.parseExchangeQueryString(queryString);
@@ -43,12 +41,6 @@ public class ExchangeServlet extends HttpServlet {
         } finally {
             responseWriter.close();
         }
-    }
-
-    private void sendError(HttpServletResponse response, int httpErrorCode, String errorMessage) throws IOException {
-        response.setStatus(httpErrorCode);
-        ErrorMessageDto errorMessageDto = new ErrorMessageDto(errorMessage);
-        response.getWriter().write(errorMessageDto.toString());
     }
 
     private void sendResponse(PrintWriter responseWriter, ConvertedExchangeRateDto response) {
