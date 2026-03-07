@@ -6,7 +6,11 @@ GET http://localhost:8080/currencies
 
 ###
 # @name currency
-GET http://localhost:8080/currency/ASD
+GET http://localhost:8080/currency/AFN
+
+###
+# @name currencyNotFound
+GET http://localhost:8080/currency/AAA
 
 ###
 # @name currencies
