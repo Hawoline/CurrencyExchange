@@ -15,6 +15,9 @@ public class CurrencyMapper {
         if (code.isEmpty()) {
             throw new IllegalArgumentException("code is empty");
         }
+        if (code.length() != 3) {
+            throw new IllegalArgumentException("Code length must be 3 symbols");
+        }
         if (name.isEmpty()) {
             throw new IllegalArgumentException("name is empty");
         }

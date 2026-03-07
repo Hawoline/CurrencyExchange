@@ -61,33 +61,19 @@ public class CurrenciesServlet extends HttpServlet {
         String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         response.setHeader("Access-Control-Allow-Origin", "http://localhost:63342");
         response.setContentType("application/json");
+        response.setCharacterEncoding(StandardCharsets.UTF_8);
         CurrencyEntity currencyEntity;
+        PrintWriter printWriter = response.getWriter();
         try {
             currencyEntity = new CurrencyMapper().fromQueryToCurrencyEntity(currencyRequestString);
-        } catch (IllegalArgumentException exception) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
-            return;
-        }
-        response.setCharacterEncoding(StandardCharsets.UTF_8);
-        PrintWriter printWriter = response.getWriter();
-        if (currencyEntity.getSign().isEmpty()
-                || currencyEntity.getName().isEmpty()
-                || currencyEntity.getCode().isEmpty()) {
-            int errorCode = HttpServletResponse.SC_BAD_REQUEST;
-            String errorMessage = "Некоторые поля пустые";
-            sendError(response, errorCode, errorMessage);
-            printWriter.close();
-            return;
-        }
-        try {
             CurrencyEntity createdCurrencyEntity = currencyDao.create(currencyEntity);
             response.setStatus(HttpServletResponse.SC_CREATED);
             printWriter.write(createdCurrencyEntity.toString());
+        } catch (IllegalArgumentException exception) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, exception.getMessage());
         } catch (DuplicateEntityException e) {
-            int errorCode = HttpServletResponse.SC_CONFLICT;
-            String errorMessage = "Такая валюта уже существует в базе данных";
-            sendError(response, errorCode, errorMessage);
-        } finally {
+            sendError(response, HttpServletResponse.SC_CONFLICT, e.getMessage());
+        }  finally {
             printWriter.close();
         }
     }
