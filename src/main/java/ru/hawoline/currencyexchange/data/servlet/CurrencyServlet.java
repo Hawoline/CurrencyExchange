@@ -17,8 +17,8 @@ public class CurrencyServlet extends CustomServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        String uri = request.getPathInfo();
-        String currencyCode = uri.replace("/", "");
+        String pathInfo = request.getPathInfo();
+        String currencyCode = pathInfo.replace("/", "");
         if (currencyCode.length() != 3) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, "Invalid currency code");
             return;
