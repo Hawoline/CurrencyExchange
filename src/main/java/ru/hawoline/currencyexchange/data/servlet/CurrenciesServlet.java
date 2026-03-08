@@ -10,9 +10,7 @@ import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends CustomServlet {
@@ -29,38 +27,39 @@ public class CurrenciesServlet extends CustomServlet {
         }
         List<CurrencyEntity> currencies = currencyDao.getAll();
 
-        StringBuilder result = toJsonString(currencies);
-        out.write(result.toString());
+        String result = toJsonString(currencies);
+        out.write(result);
         out.close();
     }
 
-    private StringBuilder toJsonString(List<CurrencyEntity> currencies) {
-        StringBuilder result = new StringBuilder();
-        result.append("[");
+    private String toJsonString(List<CurrencyEntity> currencies) {
+        StringBuilder jsonString = new StringBuilder();
+        String startSquareBracket = "[";
+        jsonString.append(startSquareBracket);
         String comma = ",";
         for (CurrencyEntity currencyEntity :
                 currencies) {
-            result.append(currencyEntity.toString()).append(comma);
+            jsonString.append(currencyEntity.toString()).append(comma);
         }
-        removeLastComma(result, comma);
+        removeLastComma(jsonString);
 
-        result.append("]");
-        return result;
+        String endSquareBracket = "]";
+        jsonString.append(endSquareBracket);
+        return jsonString.toString();
     }
 
-    private void removeLastComma(StringBuilder result, String comma) {
-        int lastIndexOfComma = result.lastIndexOf(comma);
-        result.deleteCharAt(lastIndexOfComma);
+    private void removeLastComma(StringBuilder string) {
+        String comma = ",";
+        int lastIndexOfComma = string.lastIndexOf(comma);
+        string.deleteCharAt(lastIndexOfComma);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String currencyRequestString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         addResponseHeaders(response);
-        CurrencyEntity currencyEntity;
         PrintWriter printWriter = response.getWriter();
         try {
-            currencyEntity = new CurrencyMapper().fromQueryToCurrencyEntity(currencyRequestString);
+            CurrencyEntity currencyEntity = new CurrencyMapper().getCurrencyEntityFrom(request.getParameterMap());
             CurrencyEntity createdCurrencyEntity = currencyDao.create(currencyEntity);
             response.setStatus(HttpServletResponse.SC_CREATED);
             printWriter.write(createdCurrencyEntity.toString());

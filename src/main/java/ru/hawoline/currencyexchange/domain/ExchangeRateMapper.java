@@ -20,8 +20,8 @@ public class ExchangeRateMapper {
 
     public ConvertedExchangeRateDto toConvertedExchangeRateDto(double amount, ConvertedExchangeRate convertedExchangeRate) {
         return new ConvertedExchangeRateDto(
-                currencyMapper.fromModelToEntity(convertedExchangeRate.base()),
-                currencyMapper.fromModelToEntity(convertedExchangeRate.target()),
+                currencyMapper.getCurrencyEntityFrom(convertedExchangeRate.base()),
+                currencyMapper.getCurrencyEntityFrom(convertedExchangeRate.target()),
                 convertedExchangeRate.rate(),
                 amount,
                 convertedExchangeRate.targetAmount()

@@ -25,7 +25,6 @@ public class ExchangeRateServlet extends CustomServlet {
     private CurrencyDao currencyDao = new CurrencyDao();
     private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
-    // TODO добавить CORS заголовки
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
@@ -63,6 +62,9 @@ public class ExchangeRateServlet extends CustomServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
+        response.setHeader("Access-Control-Allow-Methods", "PATCH, OPTIONS");
+        response.addHeader("Access-Control-Allow-Methods", "OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         String uri = request.getRequestURI();
         uri = uri.replaceAll("/exchangeRate/", "");
         if (uri.contains("/")) {
