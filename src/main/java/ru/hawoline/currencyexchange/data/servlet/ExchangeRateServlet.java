@@ -27,16 +27,16 @@ public class ExchangeRateServlet extends CustomServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String uri = request.getRequestURI();
         addResponseHeaders(response);
-        uri = uri.replaceAll("/exchangeRate/", "");
-        if (uri.contains("/")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        String pathInfo = request.getPathInfo();
+        String currencyCodePair = pathInfo.replace("/", "");
+        if (currencyCodePair.length() != 6) {
+            sendError(response, HttpServletResponse.SC_CONFLICT, "Currency code pair length has not 6 characters");
             return;
         }
 
-        String baseCurrencyCode = uri.substring(0, 3);
-        String targetCurrencyCode = uri.substring(3);
+        String baseCurrencyCode = pathInfo.substring(0, 3);
+        String targetCurrencyCode = pathInfo.substring(3);
 
         ExchangeRateEntity exchangeRateEntity;
         CurrencyEntity baseCurrencyEntity;
@@ -59,20 +59,21 @@ public class ExchangeRateServlet extends CustomServlet {
         );
     }
 
+    // TODO разбить на методы
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
         response.setHeader("Access-Control-Allow-Methods", "PATCH, OPTIONS");
         response.addHeader("Access-Control-Allow-Methods", "OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-        String uri = request.getRequestURI();
-        uri = uri.replaceAll("/exchangeRate/", "");
-        if (uri.contains("/")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+        String pathInfo = request.getPathInfo();
+        String currencyCodePair = pathInfo.replace("/", "");
+        if (currencyCodePair.length() != 6) {
+            sendError(response, HttpServletResponse.SC_CONFLICT, "Currency code pair length has not 6 characters");
             return;
         }
-        String baseCurrencyCode = uri.substring(0, 3);
-        String targetCurrencyCode = uri.substring(3);
+        String baseCurrencyCode = currencyCodePair.substring(0, 3);
+        String targetCurrencyCode = currencyCodePair.substring(3);
 
         CurrencyEntity baseCurrencyEntity;
         CurrencyEntity targetCurrencyEntity;
