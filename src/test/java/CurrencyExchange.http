@@ -13,6 +13,18 @@ GET http://localhost:8080/currency/AFN
 GET http://localhost:8080/currency/AAA
 
 ###
+# @name currencyCodeContainsDigits
+GET http://localhost:8080/currency/123
+
+###
+# @name invalidCurrencyCodeLength
+GET http://localhost:8080/currency/AAAA
+
+###
+# @name invalidCurrencyCodeLength
+GET http://localhost:8080/currency/AA
+
+###
 # @name currencies
 POST http://localhost:8080/currencies
 Content-Type: application/x-www-form-urlencoded

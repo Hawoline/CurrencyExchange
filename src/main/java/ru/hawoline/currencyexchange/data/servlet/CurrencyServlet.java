@@ -9,7 +9,6 @@ import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 @WebServlet(value = "/currency/*")
 public class CurrencyServlet extends CustomServlet {
@@ -18,10 +17,10 @@ public class CurrencyServlet extends CustomServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        String uri = request.getRequestURI();
-        String currencyCode = uri.replaceAll("/currency/", "");
-        if (currencyCode.contains("/")) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Uri path contains unnecessary '/'");
+        String uri = request.getPathInfo();
+        String currencyCode = uri.replace("/", "");
+        if (currencyCode.length() != 3) {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Invalid currency code");
             return;
         }
         PrintWriter out = response.getWriter();
