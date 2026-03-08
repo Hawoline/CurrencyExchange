@@ -6,18 +6,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
-import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
-import ru.hawoline.currencyexchange.domain.exception.RateNotFoundInRequestBodyException;
 import ru.hawoline.currencyexchange.domain.ExchangeRateMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends CustomServlet {
@@ -63,6 +60,7 @@ public class ExchangeRateServlet extends CustomServlet {
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
+        // TODO понять какой CORS заголовок нужен для этого метода
         response.setHeader("Access-Control-Allow-Methods", "PATCH, OPTIONS");
         response.addHeader("Access-Control-Allow-Methods", "OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -94,15 +92,7 @@ public class ExchangeRateServlet extends CustomServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, exchangeRateNotExistsMessage);
             return;
         }
-        ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
-        String requestUri = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        double rate;
-        try {
-            rate = exchangeRateParser.parseRateFromRequestBody(requestUri);
-        } catch (RateNotFoundInRequestBodyException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            return;
-        }
+        double rate = Double.parseDouble(request.getParameter("rate"));
         if (rate <= 0) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "rate <= 0");
             return;

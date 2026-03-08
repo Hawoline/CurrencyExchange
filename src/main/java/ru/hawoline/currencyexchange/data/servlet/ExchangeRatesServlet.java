@@ -16,7 +16,7 @@ import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends CustomServlet {
@@ -54,20 +54,12 @@ public class ExchangeRatesServlet extends CustomServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
-        AddExchangeRateDto exchangeRateRequestBody;
-        try {
-            exchangeRateRequestBody = exchangeRateParser.parseRequestBody(request.getReader().lines().collect(Collectors.joining(System.lineSeparator())));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
         boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
         if (!exchangeRateRequestBodyValid) {
-            try {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
-                return;
-            } catch (IOException ioException) {
-                ioException.printStackTrace();
-            }
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
+            return;
         }
         PrintWriter printWriter = response.getWriter();
         try {

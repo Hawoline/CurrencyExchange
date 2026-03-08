@@ -22,9 +22,8 @@ public class ExchangeServlet extends CustomServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        String queryString = request.getQueryString();
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
-        ExchangeDto exchangeDto = exchangeRateParser.parseExchangeQueryString(queryString);
+        ExchangeDto exchangeDto = exchangeRateParser.parseExchangeFrom(request.getParameterMap());
         PrintWriter responseWriter = response.getWriter();
         try {
             ExchangeDtoValidator exchangeDtoValidator = new ExchangeDtoValidator();
