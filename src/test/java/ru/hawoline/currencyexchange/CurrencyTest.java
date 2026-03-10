@@ -16,7 +16,7 @@ public class CurrencyTest {
         for (Currency availableCurrency : availableCurrencies) {
             System.out.println(availableCurrency);
         }
-        Currency currency = Currency.getInstance("EUR");
+        Currency.getInstance("EUR");
         Currency currency1 = Currency.getInstance(Locale.CANADA);
         System.out.println(currency1);
     }
@@ -28,7 +28,7 @@ public class CurrencyTest {
         System.out.println(currency.getDisplayName(Locale.CHINESE));
 
         // TODO validate Currency using this methods
-        Set<Currency> availableCurrencies = Currency.getAvailableCurrencies();
+        Currency.getAvailableCurrencies();
         System.out.println(currency.getDefaultFractionDigits());
         System.out.println(currency.getCurrencyCode());
         System.out.println(currency.getNumericCode());

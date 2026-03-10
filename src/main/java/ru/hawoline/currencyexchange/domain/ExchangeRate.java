@@ -5,7 +5,7 @@ import java.util.Currency;
 public class ExchangeRate {
     private final Currency base;
     private final Currency target;
-    private double rate;
+    private final double rate;
 
     public ExchangeRate(Currency base, Currency target, double rate) {
         this.base = base;

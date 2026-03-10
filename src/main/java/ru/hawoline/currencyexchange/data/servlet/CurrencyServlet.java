@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 
 @WebServlet(value = "/currency/*")
 public class CurrencyServlet extends CustomServlet {
-    private CurrencyDao dao = new CurrencyDao();
+    private final CurrencyDao dao = new CurrencyDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

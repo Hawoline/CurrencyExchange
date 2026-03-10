@@ -1,6 +1,5 @@
 package ru.hawoline.currencyexchange.domain;
 
-
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeDto;
 

@@ -18,9 +18,9 @@ import java.io.PrintWriter;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends CustomServlet {
-    private ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
-    private CurrencyDao currencyDao = new CurrencyDao();
-    private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
+    private final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+    private final CurrencyDao currencyDao = new CurrencyDao();
+    private final ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -103,7 +103,12 @@ public class ExchangeRateServlet extends CustomServlet {
                 exchangeRateEntityBeforeUpdate.targetCurrency(),
                 rate
         );
-        exchangeRateDao.update(updatedExchangeRateEntity);
+        try {
+            exchangeRateDao.update(updatedExchangeRateEntity);
+        } catch (IndexOutOfBoundsException e) {
+            sendError(response, HttpServletResponse.SC_CONFLICT, "Exchange Rate not found for update.");
+            return;
+        }
 
         sendResponse(response, exchangeRateMapper.toExchangeRateDto(updatedExchangeRateEntity,
                 baseCurrencyEntity,

@@ -14,7 +14,7 @@ import java.util.List;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends CustomServlet {
-    private CurrencyDao currencyDao = new CurrencyDao();
+    private final CurrencyDao currencyDao = new CurrencyDao();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {

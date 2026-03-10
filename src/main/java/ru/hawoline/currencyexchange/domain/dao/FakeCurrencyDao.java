@@ -3,7 +3,6 @@ package ru.hawoline.currencyexchange.domain.dao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 import ru.hawoline.currencyexchange.domain.exception.CurrencyNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
-import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class FakeCurrencyDao implements Dao<CurrencyEntity, String> {
     }
 
     @Override
-    public CurrencyEntity getByIntId(int id) throws EntityNotFoundException {
+    public CurrencyEntity getByIntId(int id) {
         return currencies.get(id);
     }
 

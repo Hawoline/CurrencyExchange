@@ -12,7 +12,7 @@ public class Connector {
             "IdeaProjects" + File.separator +
             "CurrencyExchange" + File.separator +
             "currency_exchange.sqlite";
-    private static Connection connection;
+    private static final Connection connection;
 
     static {
         try {

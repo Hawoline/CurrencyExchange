@@ -12,9 +12,9 @@ public class ExchangeRateMapper {
 
     public ExchangeRate fromExchangeRateDto(ExchangeRateDto exchangeRateDto) {
         return new ExchangeRate(
-                currencyMapper.fromEntityToModel(exchangeRateDto.getBaseCurrency()),
-                currencyMapper.fromEntityToModel(exchangeRateDto.getTargetCurrency()),
-                exchangeRateDto.getRate()
+                currencyMapper.fromEntityToModel(exchangeRateDto.baseCurrency()),
+                currencyMapper.fromEntityToModel(exchangeRateDto.targetCurrency()),
+                exchangeRateDto.rate()
         );
     }
 

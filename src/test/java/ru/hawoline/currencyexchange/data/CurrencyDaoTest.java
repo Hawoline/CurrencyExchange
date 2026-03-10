@@ -11,7 +11,7 @@ import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyDaoTest {
-    private Dao<CurrencyEntity, String> fakeCurrencyDao = new CurrencyDao();
+    private final Dao<CurrencyEntity, String> fakeCurrencyDao = new CurrencyDao();
     private final int noId = -1;
     private final CurrencyEntity firstCurrencyEntityWithoutId = new CurrencyEntity(
             noId,
@@ -29,10 +29,10 @@ class CurrencyDaoTest {
     protected void setUp() throws DuplicateEntityException {
         fakeCurrencyDao.delete(firstCurrencyEntityWithoutId.getCode());
         fakeCurrencyDao.delete(secondCurrencyEntityWithoutId.getCode());
-        testCreate();
+        create();
     }
 
-    public void testCreate() throws DuplicateEntityException {
+    public void create() throws DuplicateEntityException {
         CurrencyEntity currencyEntityWithId = fakeCurrencyDao.create(firstCurrencyEntityWithoutId);
         int firstCurrencyId = currencyEntityWithId.getId();
         assertTrue(0 < firstCurrencyId);

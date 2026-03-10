@@ -3,7 +3,6 @@ package ru.hawoline.currencyexchange.domain.dao;
 import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
-import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 import ru.hawoline.currencyexchange.domain.exception.ExchangeRateNotFoundException;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair
     }
 
     @Override
-    public void update(ExchangeRateEntity entity) throws ExchangeRateNotFoundException {
+    public void update(ExchangeRateEntity entity) {
         int index = exchangeRateEntities.indexOf(entity);
         ExchangeRateEntity onlyRateUpdated = new ExchangeRateEntity(
                 entity.id(),
@@ -60,15 +59,11 @@ public class FakeExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPair
                 entity.targetCurrency(),
                 entity.rate()
         );
-        try {
-            exchangeRateEntities.set(index, onlyRateUpdated);
-        } catch (IndexOutOfBoundsException e) {
-            throw new ExchangeRateNotFoundException("Exchange rate not found");
-        }
+        exchangeRateEntities.set(index, onlyRateUpdated);
     }
 
     @Override
-    public ExchangeRateEntity getByIntId(int id) throws EntityNotFoundException {
+    public ExchangeRateEntity getByIntId(int id) {
         return exchangeRateEntities.get(id);
     }
 

@@ -16,10 +16,10 @@ import java.util.Currency;
 import java.util.List;
 
 public class ExchangeRateService {
-    private Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao;
-    private Dao<CurrencyEntity, String> currencyDao;
-    private List<ExchangeRateEntity> exchangeRates = new ArrayList<>();
-    private ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
+    private final Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao;
+    private final Dao<CurrencyEntity, String> currencyDao;
+    private final List<ExchangeRateEntity> exchangeRates = new ArrayList<>();
+    private final ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
     public ExchangeRateService(Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao,
                                Dao<CurrencyEntity, String> currencyDao) {

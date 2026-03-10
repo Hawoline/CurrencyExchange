@@ -106,15 +106,13 @@ class FakeExchangeRateDaoTest {
                 fakeCurrencyDao.getEntityBy(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
-        ExchangeRateEntity firstWithId = null;
+        ExchangeRateEntity firstWithId;
         try {
             firstWithId = fakeExchangeRateDao.create(firstExchangeRateEntityBeforeSave);
         } catch (DuplicateEntityException e) {
             throw new RuntimeException(e);
         }
-        assertThrows(DuplicateEntityException.class, () -> {
-            ExchangeRateEntity duplicatedFirstWithId = fakeExchangeRateDao.create(firstExchangeRateEntityBeforeSave);
-        });
+        assertThrows(DuplicateEntityException.class, () -> fakeExchangeRateDao.create(firstExchangeRateEntityBeforeSave));
 
         assertEquals(0, firstWithId.id());
     }
@@ -152,9 +150,7 @@ class FakeExchangeRateDaoTest {
     }
 
     private void testGetByExchangeRateIdNotFound(CurrencyPairEntity currencyPairEntity) {
-        assertThrows(EntityNotFoundException.class, () -> {
-            ExchangeRateEntity errorDto = fakeExchangeRateDao.getEntityBy(currencyPairEntity);
-        });
+        assertThrows(EntityNotFoundException.class, () -> fakeExchangeRateDao.getEntityBy(currencyPairEntity));
     }
 
     @Test
@@ -171,7 +167,7 @@ class FakeExchangeRateDaoTest {
                 fakeCurrencyDao.getEntityBy(secondCurrencyEntityWithoutId.getCode()),
                 10
         );
-        ExchangeRateEntity savedExchangeRateDto = fakeExchangeRateDao.create(exchangeRateDtoBeforeSave);
+        fakeExchangeRateDao.create(exchangeRateDtoBeforeSave);
         assertEquals(1, fakeExchangeRateDao.getAll().size());
     }
 
@@ -217,9 +213,7 @@ class FakeExchangeRateDaoTest {
                 targetCurrency,
                 expectedRate
         );
-        assertThrows(ExchangeRateNotFoundException.class, () -> {
-            fakeExchangeRateDao.update(updatedExchangeRateDto);
-        });
+        assertThrows(ExchangeRateNotFoundException.class, () -> fakeExchangeRateDao.update(updatedExchangeRateDto));
     }
 
     private void fillFakeExchangeRateDao() throws DuplicateEntityException, EntityNotFoundException {

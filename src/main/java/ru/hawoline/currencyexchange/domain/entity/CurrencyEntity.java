@@ -39,11 +39,14 @@ public class CurrencyEntity {
 
     @Override
     public String toString() {
-        String result = "{\"id\": " + id + "," +
-                "\"name\": \"" + name + "\"," +
-                "\"code\": \"" + code + "\"," +
-                "\"sign\": \"" + sign + "\"}";
-
-        return result;
+        // TODO протестить
+        return """
+                {
+                    "id": %d,
+                    "name": "%s",
+                    "code": "%s",
+                    "sign": "%s"
+                }
+                """.formatted(id, name, code, sign);
     }
 }

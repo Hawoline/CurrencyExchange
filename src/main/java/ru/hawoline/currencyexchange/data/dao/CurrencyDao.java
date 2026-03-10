@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyDao implements Dao<CurrencyEntity, String> {
-    private Connection connection = new Connector().getConnection();
-    private CurrencySqlMapper currencySqlMapper = new CurrencySqlMapper();
+    private final Connection connection = new Connector().getConnection();
+    private final CurrencySqlMapper currencySqlMapper = new CurrencySqlMapper();
 
     @Override
     public List<CurrencyEntity> getAll() {

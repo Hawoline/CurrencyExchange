@@ -13,9 +13,9 @@ class ExchangeRateTest {
         Currency dollar = Currency.getInstance("USD");
         Currency ruble = Currency.getInstance("RUB");
         ExchangeRate e = new ExchangeRate(dollar, ruble, 80);
-        assertEquals(80, e.exchangeToTarget(1));
-        assertEquals(0.5, e.exchangeToBase(40));
-        assertEquals(0.33, e.exchangeToBase(26.65));
-        assertEquals(26.648, e.exchangeToTarget(0.3331));
+        assertEquals(80, e.exchangeToTarget(1).targetAmount());
+        assertEquals(0.5, e.exchangeToBase(40).targetAmount());
+        assertEquals(0.33, e.exchangeToBase(26.65).targetAmount());
+        assertEquals(26.648, e.exchangeToTarget(0.3331).targetAmount());
     }
 }

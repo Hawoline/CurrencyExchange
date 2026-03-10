@@ -20,7 +20,7 @@ import java.util.Map;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends CustomServlet {
-    private ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
+    private final ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {

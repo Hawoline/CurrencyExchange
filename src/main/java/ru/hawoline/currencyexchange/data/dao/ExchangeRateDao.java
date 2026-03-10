@@ -15,7 +15,7 @@ import java.util.List;
 
 
 public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPairEntity> {
-    private Connection connection = new Connector().getConnection();
+    private final Connection connection = new Connector().getConnection();
 
     @Override
     public ExchangeRateEntity create(ExchangeRateEntity exchangeRateEntity) throws DuplicateEntityException {
