@@ -41,9 +41,7 @@ public class ExchangeRateServlet extends CustomServlet {
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        response.setHeader("Access-Control-Allow-Methods", "OPTIONS, PATCH");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
+        response.setHeader("Access-Control-Allow-Methods", "PATCH");
         response.getWriter().write("");
     }
 
@@ -68,7 +66,7 @@ public class ExchangeRateServlet extends CustomServlet {
         } catch (EntityNotFoundException e) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Bad rate");
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Rate type is not long!");
         } catch (IndexOutOfBoundsException e) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found for update.");
         }
