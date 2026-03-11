@@ -54,7 +54,7 @@ public class ExchangeRateServlet extends CustomServlet {
             String rateQueryString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             double rate = parseRate(rateQueryString);
             if (rate <= 0) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "rate <= 0");
+                sendError(response, HttpServletResponse.SC_BAD_REQUEST, "rate <= 0");
                 return;
             }
             ExchangeRateEntity updatedExchangeRateEntity = new ExchangeRateEntity(
@@ -66,9 +66,9 @@ public class ExchangeRateServlet extends CustomServlet {
             exchangeRateDao.update(updatedExchangeRateEntity);
             sendResponse(response.getWriter(), exchangeRateMapper.toExchangeRateDto(updatedExchangeRateEntity));
         } catch (EntityNotFoundException e) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Bad rate");
         } catch (IndexOutOfBoundsException e) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found for update.");
         }
