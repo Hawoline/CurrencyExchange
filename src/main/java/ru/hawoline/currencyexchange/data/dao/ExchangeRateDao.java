@@ -121,7 +121,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPairEnti
             preparedStatement.setLong(2, entity.id());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // TODO нормально обработать
         }
     }
 

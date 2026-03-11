@@ -48,7 +48,7 @@ rate = 0.2
 
 ###
 # @name getConcreteExchangeRate
-GET http://localhost:8080/exchangeRate/AFNALL
+GET http://localhost:8080/exchangeRate/ALLDZD
 Content-Type: application/x-www-form-urlencoded
 
 rate = 6

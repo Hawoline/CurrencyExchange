@@ -28,12 +28,11 @@ public class ExchangeRateMapper {
         );
     }
 
-    public ExchangeRateDto toExchangeRateDto(ExchangeRateEntity exchangeRateEntity, CurrencyEntity baseCurrencyEntity,
-                                             CurrencyEntity targetCurrencyEntity) {
+    public ExchangeRateDto toExchangeRateDto(ExchangeRateEntity exchangeRateEntity) {
         return new ExchangeRateDto(
                 exchangeRateEntity.id(),
-                baseCurrencyEntity,
-                targetCurrencyEntity,
+                exchangeRateEntity.baseCurrency(),
+                exchangeRateEntity.targetCurrency(),
                 exchangeRateEntity.rate()
         );
     }

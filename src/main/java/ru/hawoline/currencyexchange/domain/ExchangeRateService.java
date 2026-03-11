@@ -40,10 +40,7 @@ public class ExchangeRateService {
 
     public ExchangeRateDto getLastAdded() throws EntityNotFoundException {
         ExchangeRateEntity last = exchangeRates.getLast();
-        return exchangeRateMapper.toExchangeRateDto(last,
-                currencyDao.getByIntId(last.baseCurrency().getId()),
-                currencyDao.getByIntId(last.targetCurrency().getId())
-        );
+        return exchangeRateMapper.toExchangeRateDto(last);
     }
 
     public ConvertedExchangeRateDto convert(ExchangeDto exchangeDto) throws EntityNotFoundException {
