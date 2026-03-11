@@ -1,5 +1,6 @@
 package ru.hawoline.currencyexchange.data.servlet;
 
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import ru.hawoline.currencyexchange.domain.ExchangeRateMapper;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.stream.Collectors;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends CustomServlet {
@@ -31,39 +33,40 @@ public class ExchangeRateServlet extends CustomServlet {
             sendError(response, HttpServletResponse.SC_CONFLICT, "Currency code pair length has not 6 characters");
             return;
         }
-
         String baseCurrencyCode = pathInfo.substring(0, 3);
         String targetCurrencyCode = pathInfo.substring(3);
 
-        ExchangeRateEntity exchangeRateEntity;
-        CurrencyEntity baseCurrencyEntity;
-        CurrencyEntity targetCurrencyEntity;
         try {
-            baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
-            targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
-            exchangeRateEntity = exchangeRateDao.getEntityBy(new CurrencyPairEntity(baseCurrencyEntity, targetCurrencyEntity));
+            CurrencyEntity baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
+            CurrencyEntity targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
+            ExchangeRateEntity result = exchangeRateDao.getEntityBy(new CurrencyPairEntity(baseCurrencyEntity, targetCurrencyEntity));
+            sendResponse(response.getWriter(), exchangeRateMapper.toExchangeRateDto(
+                    result,
+                    baseCurrencyEntity,
+                    targetCurrencyEntity)
+            );
         } catch (CurrencyNotFoundException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-            return;
         } catch (ExchangeRateNotFoundException e) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-            return;
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         }
-        sendResponse(response, exchangeRateMapper.toExchangeRateDto(
-                exchangeRateEntity,
-                baseCurrencyEntity,
-                targetCurrencyEntity)
-        );
+
+        response.getWriter().close();
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        addResponseHeaders(response);
+        response.setHeader("Access-Control-Allow-Methods", "OPTIONS, PATCH");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        response.getWriter().write("");
     }
 
     // TODO разбить на методы
     @Override
     protected void doPatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        // TODO понять какой CORS заголовок нужен для этого метода
-        response.setHeader("Access-Control-Allow-Methods", "PATCH, OPTIONS");
-        response.addHeader("Access-Control-Allow-Methods", "OPTIONS");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         String pathInfo = request.getPathInfo();
         String currencyCodePair = pathInfo.replace("/", "");
         if (currencyCodePair.length() != 6) {
@@ -73,52 +76,53 @@ public class ExchangeRateServlet extends CustomServlet {
         String baseCurrencyCode = currencyCodePair.substring(0, 3);
         String targetCurrencyCode = currencyCodePair.substring(3);
 
-        CurrencyEntity baseCurrencyEntity;
-        CurrencyEntity targetCurrencyEntity;
         try {
-            baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
-            targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
+            CurrencyEntity baseCurrencyEntity = currencyDao.getEntityBy(baseCurrencyCode);
+            CurrencyEntity targetCurrencyEntity = currencyDao.getEntityBy(targetCurrencyCode);
+            CurrencyPairEntity currencyPairEntity = new CurrencyPairEntity(baseCurrencyEntity, targetCurrencyEntity);
+            try {
+                ExchangeRateEntity exchangeRateEntityBeforeUpdate = exchangeRateDao.getEntityBy(currencyPairEntity);
+                String rateQueryString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+                double rate = parseRate(rateQueryString);
+                if (rate <= 0) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "rate <= 0");
+                    return;
+                }
+                ExchangeRateEntity updatedExchangeRateEntity = new ExchangeRateEntity(
+                        exchangeRateEntityBeforeUpdate.id(),
+                        exchangeRateEntityBeforeUpdate.baseCurrency(),
+                        exchangeRateEntityBeforeUpdate.targetCurrency(),
+                        rate
+                );
+                try {
+                    exchangeRateDao.update(updatedExchangeRateEntity);
+                    sendResponse(response.getWriter(), exchangeRateMapper.toExchangeRateDto(updatedExchangeRateEntity,
+                            baseCurrencyEntity,
+                            targetCurrencyEntity)
+                    );
+                } catch (IndexOutOfBoundsException e) {
+                    sendError(response, HttpServletResponse.SC_CONFLICT, "Exchange Rate not found for update.");
+                }
+            } catch (ExchangeRateNotFoundException e) {
+                String exchangeRateNotExistsMessage = "Exchange Rate with this Codes does not exists";
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, exchangeRateNotExistsMessage);
+            }
+
         } catch (CurrencyNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Base or Target Currency Code not found");
-            return;
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         }
-
-        CurrencyPairEntity currencyPairEntity = new CurrencyPairEntity(baseCurrencyEntity, targetCurrencyEntity);
-        ExchangeRateEntity exchangeRateEntityBeforeUpdate;
-        try {
-            exchangeRateEntityBeforeUpdate = exchangeRateDao.getEntityBy(currencyPairEntity);
-        } catch (ExchangeRateNotFoundException e) {
-            String exchangeRateNotExistsMessage = "Exchange Rate with this Codes does not exists";
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, exchangeRateNotExistsMessage);
-            return;
-        }
-        double rate = Double.parseDouble(request.getParameter("rate"));
-        if (rate <= 0) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "rate <= 0");
-            return;
-        }
-        ExchangeRateEntity updatedExchangeRateEntity = new ExchangeRateEntity(
-                exchangeRateEntityBeforeUpdate.id(),
-                exchangeRateEntityBeforeUpdate.baseCurrency(),
-                exchangeRateEntityBeforeUpdate.targetCurrency(),
-                rate
-        );
-        try {
-            exchangeRateDao.update(updatedExchangeRateEntity);
-        } catch (IndexOutOfBoundsException e) {
-            sendError(response, HttpServletResponse.SC_CONFLICT, "Exchange Rate not found for update.");
-            return;
-        }
-
-        sendResponse(response, exchangeRateMapper.toExchangeRateDto(updatedExchangeRateEntity,
-                baseCurrencyEntity,
-                targetCurrencyEntity)
-        );
     }
 
-    private void sendResponse(HttpServletResponse response, ExchangeRateDto exchangeRateDto) throws IOException {
-        PrintWriter out;
-        out = response.getWriter();
+    private double parseRate(String rateQueryString) {
+        String[] pair = rateQueryString.split("=");
+        if (pair.length > 1) {
+            return Double.parseDouble(pair[1]);
+        }
+
+        return -1;
+    }
+
+    private void sendResponse(PrintWriter out, ExchangeRateDto exchangeRateDto) {
         out.write(exchangeRateDto.toString());
         out.close();
     }
