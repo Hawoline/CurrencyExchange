@@ -5,13 +5,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.hawoline.currencyexchange.data.dao.CurrencyDao;
 import ru.hawoline.currencyexchange.data.dao.ExchangeRateDao;
-import ru.hawoline.currencyexchange.domain.validator.ExchangeRateDtoValidator;
 import ru.hawoline.currencyexchange.domain.ExchangeRateParser;
+import ru.hawoline.currencyexchange.domain.ExchangeRateService;
 import ru.hawoline.currencyexchange.domain.dto.AddExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.dto.ExchangeRateDto;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
-import ru.hawoline.currencyexchange.domain.ExchangeRateService;
+import ru.hawoline.currencyexchange.domain.validator.ExchangeRateDtoValidator;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,32 +55,26 @@ public class ExchangeRatesServlet extends CustomServlet {
         addResponseHeaders(response);
         ExchangeRateParser exchangeRateParser = new ExchangeRateParser();
         Map<String, String[]> parameterMap = request.getParameterMap();
-        AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
-        boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
-        if (!exchangeRateRequestBodyValid) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
-            return;
-        }
-        PrintWriter printWriter = response.getWriter();
+        PrintWriter responseWriter = response.getWriter();
         try {
+            AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
+            boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
+            if (!exchangeRateRequestBodyValid) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
+                responseWriter.close();
+                return;
+            }
             exchangeRateService.add(exchangeRateRequestBody);
+            String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
+            responseWriter.write(exchangeRateResponseString);
+        } catch (NumberFormatException e) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "rate empty or is not type double");
         } catch (DuplicateEntityException e) {
             sendError(response, HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate");
-            printWriter.close();
-            return;
         } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes doesnot exists in db");
-            printWriter.close();
-            return;
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes does not exists in db");
         }
 
-        try {
-            String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
-            printWriter.write(exchangeRateResponseString);
-        } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "Exchange Rate not found after adding");
-        } finally {
-            printWriter.close();
-        }
+        responseWriter.close();
     }
 }

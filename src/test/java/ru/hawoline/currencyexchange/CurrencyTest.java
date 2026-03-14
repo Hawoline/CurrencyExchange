@@ -1,19 +1,22 @@
 package ru.hawoline.currencyexchange;
 
 import org.junit.jupiter.api.Test;
+import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 
 import java.util.Currency;
 import java.util.Locale;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CurrencyTest {
 
     @Test
     public void testConstructors() {
         Set<Currency> availableCurrencies = Currency.getAvailableCurrencies(); // TODO усилить валидацию при помощи данного метода
-        System.out.println(availableCurrencies.size());
+        System.out.println("Size: " + availableCurrencies.size());
         for (Currency availableCurrency : availableCurrencies) {
-            System.out.println(availableCurrency);
+            System.out.printf("%s %s\n", availableCurrency, availableCurrency.getSymbol());
         }
         Currency.getInstance("EUR");
         Currency currency1 = Currency.getInstance(Locale.CANADA);
@@ -32,5 +35,10 @@ public class CurrencyTest {
         System.out.println(currency.getCurrencyCode());
         System.out.println(currency.getNumericCode());
         System.out.println(currency.getSymbol());
+    }
+
+    @Test
+    public void testGetCurrencySignWithoutCode() {
+
     }
 }
