@@ -37,7 +37,7 @@ public class ExchangeRatesServlet extends CustomServlet {
         String comma = ",";
         for (ExchangeRateDto exchangeRateResponse :
                 exchangeRateEntities) {
-            result.append(exchangeRateResponse.toString()).append(comma);
+            result.append(exchangeRateResponse).append(comma);
         }
         removeLastComma(result, comma);
         result.append("]");

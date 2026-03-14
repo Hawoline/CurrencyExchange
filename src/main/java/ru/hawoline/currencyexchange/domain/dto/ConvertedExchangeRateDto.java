@@ -17,8 +17,7 @@ public record ConvertedExchangeRateDto(CurrencyEntity baseCurrency,
                     "rate": %s,
                     "amount": %s,
                     "convertedAmount": %s
-                }
-                """, baseCurrency.toString(), targetCurrency.toString(), rate, amount, convertedAmount
+                }""", baseCurrency, targetCurrency, rate, amount, convertedAmount
         );
     }
 }

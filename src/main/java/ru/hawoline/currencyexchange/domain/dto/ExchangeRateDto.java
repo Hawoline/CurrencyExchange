@@ -20,10 +20,12 @@ public record ExchangeRateDto(long id, CurrencyEntity baseCurrency, CurrencyEnti
 
     @Override
     public String toString() {
-
-        return "{\"id\": " + id + "," +
-                "\"baseCurrency\": " + baseCurrency.toString() + "," +
-                "\"targetCurrency\": " + targetCurrency.toString() + "," +
-                "\"rate\": \"" + rate + "\"}";
+        return String.format("""
+                {
+                    "id": %s,
+                    "baseCurrency": %s,
+                    "targetCurrency": %s,
+                    "rate": %s
+                }""", id, baseCurrency, targetCurrency, rate);
     }
 }
