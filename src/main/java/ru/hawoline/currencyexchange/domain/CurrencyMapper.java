@@ -10,7 +10,7 @@ public class CurrencyMapper {
         String code = codes[0];
         Currency currency = Currency.getInstance(code);
 
-        return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol());
+        return getCurrencyEntityFrom(currency);
     }
 
     public CurrencyEntity getCurrencyEntityFrom(Currency currency) {
