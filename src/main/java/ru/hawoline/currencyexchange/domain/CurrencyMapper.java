@@ -2,7 +2,9 @@ package ru.hawoline.currencyexchange.domain;
 
 import ru.hawoline.currencyexchange.domain.entity.CurrencyEntity;
 
-import java.util.*;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.Map;
 
 public class CurrencyMapper {
     public CurrencyEntity getCurrencyEntityFrom(Map<String, String[]> parameterMap) {
