@@ -59,14 +59,13 @@ public class ExchangeRatesServlet extends CustomServlet {
         try {
             AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
             boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
-            if (!exchangeRateRequestBodyValid) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
-                responseWriter.close();
-                return;
+            if (exchangeRateRequestBodyValid) {
+                exchangeRateService.add(exchangeRateRequestBody);
+                String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
+                responseWriter.write(exchangeRateResponseString);
+            } else {
+                sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
             }
-            exchangeRateService.add(exchangeRateRequestBody);
-            String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
-            responseWriter.write(exchangeRateResponseString);
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "rate empty or is not type double");
         } catch (DuplicateEntityException e) {
