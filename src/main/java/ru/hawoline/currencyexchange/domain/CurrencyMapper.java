@@ -13,11 +13,11 @@ public class CurrencyMapper {
         return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol());
     }
 
-    public Currency fromEntityToModel(CurrencyEntity currencyEntity) {
-        return Currency.getInstance(currencyEntity.getCode());
-    }
-
     public CurrencyEntity getCurrencyEntityFrom(Currency currency) {
         return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol());
+    }
+
+    public Currency fromEntityToModel(CurrencyEntity currencyEntity) {
+        return Currency.getInstance(currencyEntity.getCode());
     }
 }
