@@ -58,11 +58,8 @@ public class ExchangeRateService {
         } catch (EntityNotFoundException ignored) {
 
         }
-        try {
-            return convertAtCrossRate(amount, baseCurrencyEntity, targetCurrencyEntity);
-        } catch (EntityNotFoundException e) {
-            throw new RuntimeException(e); // TODO fix
-        }
+
+        return convertAtCrossRate(amount, baseCurrencyEntity, targetCurrencyEntity);
     }
 
     private ConvertedExchangeRateDto convertAtDirectRate(double amount, CurrencyEntity base, CurrencyEntity target) throws EntityNotFoundException {
