@@ -1,7 +1,6 @@
-package ru.hawoline.currencyexchange;
+package ru.hawoline.currencyexchange.data;
 
 import org.junit.jupiter.api.Test;
-import ru.hawoline.currencyexchange.domain.entity.CurrencyPairEntity;
 
 import java.util.Currency;
 import java.util.Locale;

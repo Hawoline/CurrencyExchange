@@ -16,6 +16,15 @@ class ExchangeRateTest {
         assertEquals(80, e.exchangeToTarget(1).targetAmount());
         assertEquals(0.5, e.exchangeToBase(40).targetAmount());
         assertEquals(0.33, e.exchangeToBase(26.65).targetAmount());
-        assertEquals(26.648, e.exchangeToTarget(0.3331).targetAmount());
+        assertEquals(26.65, e.exchangeToTarget(0.3331).targetAmount());
+
+        ExchangeRate exchangeRate = new ExchangeRate(dollar, ruble, 3.3);
+        assertEquals(9.9, exchangeRate.exchangeToTarget(3).targetAmount());
+    }
+
+    @Test
+    void testCurrency() {
+        Currency japanYan = Currency.getInstance("JPY");
+        assertEquals(0, japanYan.getDefaultFractionDigits());
     }
 }

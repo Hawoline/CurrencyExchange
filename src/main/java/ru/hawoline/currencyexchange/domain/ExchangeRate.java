@@ -19,7 +19,9 @@ public class ExchangeRate {
 
     public ConvertedExchangeRate exchangeToTarget(double baseAmount) {
         double targetAmount = rate * baseAmount;
-        return new ConvertedExchangeRate(base, target, rate, targetAmount);
+        double pow = Math.pow(10, target.getDefaultFractionDigits());
+        double roundedAmount = Math.round(targetAmount * pow) / pow;
+        return new ConvertedExchangeRate(base, target, rate, roundedAmount);
     }
 
     public ConvertedExchangeRate exchangeToBase(double targetAmount) {

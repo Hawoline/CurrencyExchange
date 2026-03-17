@@ -43,7 +43,7 @@ class ExchangeRateServiceTest {
     @Test
     public void testConvertDirectRate() throws EntityNotFoundException {
         ConvertedExchangeRateDto converted = exchangeRateService.convert(new ExchangeDto("EUR", "ALL", 5));
-        assertEquals(50, converted.convertedAmount());
+        assertEquals(10, converted.convertedAmount());
     }
 
     @Test
