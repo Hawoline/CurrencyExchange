@@ -18,7 +18,6 @@ import java.util.List;
 public class ExchangeRateService {
     private final Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao;
     private final Dao<CurrencyEntity, String> currencyDao;
-    private final List<ExchangeRateEntity> exchangeRates = new ArrayList<>();
     private final ExchangeRateMapper exchangeRateMapper = new ExchangeRateMapper();
 
     public ExchangeRateService(Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao,
@@ -27,20 +26,14 @@ public class ExchangeRateService {
         this.currencyDao = currencyDao;
     }
 
-    public void add(AddExchangeRateDto addExchangeRateDto) throws DuplicateEntityException, EntityNotFoundException {
+    public ExchangeRateDto add(AddExchangeRateDto addExchangeRateDto) throws DuplicateEntityException, EntityNotFoundException {
         CurrencyEntity baseCurrencyEntity = currencyDao.getEntityBy(addExchangeRateDto.baseCurrencyCode());
         CurrencyEntity targetCurrencyEntity = currencyDao.getEntityBy(addExchangeRateDto.targetCurrencyCode());
         ExchangeRateEntity beforeSave = new ExchangeRateEntity(
                 -1, baseCurrencyEntity, targetCurrencyEntity, addExchangeRateDto.rate()
         );
         ExchangeRateEntity withSavedId = exchangeRateDao.create(beforeSave);
-
-        exchangeRates.add(withSavedId);
-    }
-
-    public ExchangeRateDto getLastAdded() throws EntityNotFoundException {
-        ExchangeRateEntity last = exchangeRates.getLast();
-        return exchangeRateMapper.toExchangeRateDto(last);
+        return exchangeRateMapper.toExchangeRateDto(withSavedId);
     }
 
     public ConvertedExchangeRateDto convert(ExchangeDto exchangeDto) throws EntityNotFoundException {

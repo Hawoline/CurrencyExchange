@@ -60,8 +60,8 @@ public class ExchangeRatesServlet extends CustomServlet {
             AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
             boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
             if (exchangeRateRequestBodyValid) {
-                exchangeRateService.add(exchangeRateRequestBody);
-                String exchangeRateResponseString = exchangeRateService.getLastAdded().toString();
+
+                String exchangeRateResponseString = exchangeRateService.add(exchangeRateRequestBody).toString();
                 responseWriter.write(exchangeRateResponseString);
             } else {
                 sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
