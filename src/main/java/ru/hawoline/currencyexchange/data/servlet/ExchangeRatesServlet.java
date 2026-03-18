@@ -60,7 +60,6 @@ public class ExchangeRatesServlet extends CustomServlet {
             AddExchangeRateDto exchangeRateRequestBody = exchangeRateParser.parseAddExchangeRateFrom(parameterMap);
             boolean exchangeRateRequestBodyValid = new ExchangeRateDtoValidator().validate(exchangeRateRequestBody);
             if (exchangeRateRequestBodyValid) {
-
                 String exchangeRateResponseString = exchangeRateService.add(exchangeRateRequestBody).toString();
                 responseWriter.write(exchangeRateResponseString);
             } else {
