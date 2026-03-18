@@ -23,14 +23,9 @@ public class ExchangeRatesServlet extends CustomServlet {
     private final ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         addResponseHeaders(response);
-        PrintWriter out = null;
-        try {
-            out = response.getWriter();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        PrintWriter out = response.getWriter();
         List<ExchangeRateDto> exchangeRateEntities = exchangeRateService.getAll();
         StringBuilder result = new StringBuilder();
         result.append("[");
