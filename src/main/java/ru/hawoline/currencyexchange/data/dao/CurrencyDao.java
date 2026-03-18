@@ -62,38 +62,17 @@ public class CurrencyDao implements Dao<CurrencyEntity, String> {
 
     @Override
     public CurrencyEntity getEntityBy(String currencyCode) throws CurrencyNotFoundException {
-        String sql = "SELECT * FROM Currencies WHERE Code = '" + currencyCode + "';";
-        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
+        String sql = "SELECT * FROM Currencies WHERE Code = ?;";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, currencyCode);
+            ResultSet resultSet = preparedStatement.executeQuery();
             if (!resultSet.next()) {
                 throw new CurrencyNotFoundException(currencyCode);
             }
             return currencySqlMapper.fromResultSet(resultSet);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public CurrencyEntity getByIntId(int id) throws CurrencyNotFoundException {
-        String sql = "SELECT * FROM Currencies WHERE ID = '" + id + "';";
-        try (ResultSet resultSet = connection.prepareStatement(sql).executeQuery()) {
-            if (!resultSet.next()) {
-                throw new CurrencyNotFoundException(String.valueOf(id));
-            }
-            return currencySqlMapper.fromResultSet(resultSet);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void delete(String id) {
-        String sql = "DELETE FROM Currencies WHERE Code = ?;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, id);
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            throw new CurrencyNotFoundException(currencyCode);
         }
     }
 

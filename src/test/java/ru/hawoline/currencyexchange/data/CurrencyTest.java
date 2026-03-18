@@ -28,7 +28,6 @@ public class CurrencyTest {
         System.out.println(currency.getDisplayName());
         System.out.println(currency.getDisplayName(Locale.CHINESE));
 
-        // TODO validate Currency using this methods
         Currency.getAvailableCurrencies();
         System.out.println(currency.getDefaultFractionDigits());
         System.out.println(currency.getCurrencyCode());

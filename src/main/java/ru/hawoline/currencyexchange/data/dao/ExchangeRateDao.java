@@ -121,38 +121,7 @@ public class ExchangeRateDao implements Dao<ExchangeRateEntity, CurrencyPairEnti
             preparedStatement.setLong(2, entity.id());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e); // TODO нормально обработать
-        }
-    }
-
-    @Override
-    public ExchangeRateEntity getByIntId(int id) throws EntityNotFoundException {
-        String sql = "SELECT * FROM ExchangeRates WHERE ID = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (!resultSet.next()) {
-                    throw new EntityNotFoundException("Exchange Rate with selected ID does not exist in Db");
-                }
-
-                int baseCurrencyId = resultSet.getInt("BaseCurrencyId");
-                CurrencyEntity baseCurrencyEntity = new CurrencyEntity(baseCurrencyId);
-                CurrencyEntity targetCurrencyEntity = new CurrencyEntity(id);
-                return new ExchangeRateEntity(
-                        resultSet.getInt("ID"),
-                        baseCurrencyEntity,
-                        targetCurrencyEntity,
-                        resultSet.getDouble("Rate")
-                );
-            }
-        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public void delete(CurrencyPairEntity id) {
-        // TODO realize
-    }
-
 }
