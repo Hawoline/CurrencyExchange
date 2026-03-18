@@ -1,3 +1,5 @@
 /.idea/
 /src/test/java/test.json
 /target/
+/out/
+/CurrencyExchange.iml
