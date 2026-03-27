@@ -20,7 +20,10 @@ import java.util.Map;
 
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends CustomServlet {
-    private final ExchangeRateService exchangeRateService = new ExchangeRateService(new ExchangeRateDao(), new CurrencyDao());
+    private final ExchangeRateService exchangeRateService = new ExchangeRateService(
+            new ExchangeRateDao(),
+            new CurrencyDao()
+    );
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -30,8 +33,7 @@ public class ExchangeRatesServlet extends CustomServlet {
         StringBuilder result = new StringBuilder();
         result.append("[");
         String comma = ",";
-        for (ExchangeRateDto exchangeRateResponse :
-                exchangeRateEntities) {
+        for (ExchangeRateDto exchangeRateResponse : exchangeRateEntities) {
             result.append(exchangeRateResponse).append(comma);
         }
         removeLastComma(result, comma);
@@ -58,14 +60,17 @@ public class ExchangeRatesServlet extends CustomServlet {
                 String exchangeRateResponseString = exchangeRateService.add(exchangeRateRequestBody).toString();
                 responseWriter.write(exchangeRateResponseString);
             } else {
-                sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid request body:  " + exchangeRateRequestBody);
+                sendError(response, HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid request body:  " + exchangeRateRequestBody);
             }
         } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "rate empty or is not type double");
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST,
+                    "rate empty or is not type double");
         } catch (DuplicateEntityException e) {
             sendError(response, HttpServletResponse.SC_CONFLICT, "It is duplicate Exchange Rate");
         } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, "One or two currency codes does not exists in db");
+            sendError(response, HttpServletResponse.SC_NOT_FOUND,
+                    "One or two currency codes does not exists in db");
         }
 
         responseWriter.close();

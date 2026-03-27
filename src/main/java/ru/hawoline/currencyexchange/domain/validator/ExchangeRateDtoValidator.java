@@ -8,8 +8,8 @@ public class ExchangeRateDtoValidator implements Validator<AddExchangeRateDto> {
         boolean baseCurrencyCodeValid = validateCurrencyCode(addExchangeRateDto.baseCurrencyCode());
         boolean targetCurrencyCodeValid = validateCurrencyCode(addExchangeRateDto.targetCurrencyCode());
         boolean rateValid = addExchangeRateDto.rate() > 0;
-        boolean differentCurrencyCodes = !addExchangeRateDto.baseCurrencyCode().equalsIgnoreCase(addExchangeRateDto.targetCurrencyCode());
-        return baseCurrencyCodeValid && targetCurrencyCodeValid && rateValid && differentCurrencyCodes;
+        boolean isPairCurrencyCodesDifferent = !addExchangeRateDto.baseCurrencyCode().equalsIgnoreCase(addExchangeRateDto.targetCurrencyCode());
+        return baseCurrencyCodeValid && targetCurrencyCodeValid && rateValid && isPairCurrencyCodesDifferent;
     }
 
     private boolean validateCurrencyCode(String targetCurrencyCode) {
