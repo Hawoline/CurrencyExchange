@@ -11,9 +11,9 @@ import ru.hawoline.currencyexchange.domain.entity.ExchangeRateEntity;
 import ru.hawoline.currencyexchange.domain.exception.DuplicateEntityException;
 import ru.hawoline.currencyexchange.domain.exception.EntityNotFoundException;
 
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRateService {
     private final Dao<ExchangeRateEntity, CurrencyPairEntity> exchangeRateDao;
@@ -26,7 +26,8 @@ public class ExchangeRateService {
         this.currencyDao = currencyDao;
     }
 
-    public ExchangeRateDto add(AddExchangeRateDto addExchangeRateDto) throws DuplicateEntityException, EntityNotFoundException {
+    public ExchangeRateDto add(AddExchangeRateDto addExchangeRateDto)
+            throws DuplicateEntityException, EntityNotFoundException {
         CurrencyEntity baseCurrencyEntity = currencyDao.getEntityBy(addExchangeRateDto.baseCurrencyCode());
         CurrencyEntity targetCurrencyEntity = currencyDao.getEntityBy(addExchangeRateDto.targetCurrencyCode());
         ExchangeRateEntity beforeSave = new ExchangeRateEntity(
@@ -36,7 +37,8 @@ public class ExchangeRateService {
         return exchangeRateMapper.toExchangeRateDto(withSavedId);
     }
 
-    public ConvertedExchangeRateDto convert(ExchangeDto exchangeDto) throws EntityNotFoundException {
+    public ConvertedExchangeRateDto convert(ExchangeDto exchangeDto)
+            throws EntityNotFoundException {
         CurrencyEntity baseCurrencyEntity = currencyDao.getEntityBy(exchangeDto.from());
         CurrencyEntity targetCurrencyEntity = currencyDao.getEntityBy(exchangeDto.to());
 
@@ -55,7 +57,8 @@ public class ExchangeRateService {
         return convertAtCrossRate(amount, baseCurrencyEntity, targetCurrencyEntity);
     }
 
-    private ConvertedExchangeRateDto convertAtDirectRate(double amount, CurrencyEntity base, CurrencyEntity target) throws EntityNotFoundException {
+    private ConvertedExchangeRateDto convertAtDirectRate(double amount, CurrencyEntity base, CurrencyEntity target)
+            throws EntityNotFoundException {
         ExchangeRateEntity exchangeRateEntity = exchangeRateDao.getEntityBy(new CurrencyPairEntity(
                 base, target)
         );
@@ -82,25 +85,23 @@ public class ExchangeRateService {
         return exchangeRateMapper.toConvertedExchangeRateDto(amount, convertedAmount);
     }
 
-    private ConvertedExchangeRateDto convertAtCrossRate(double amount, CurrencyEntity base, CurrencyEntity target) throws EntityNotFoundException {
+    private ConvertedExchangeRateDto convertAtCrossRate(double amount, CurrencyEntity base, CurrencyEntity target)
+            throws EntityNotFoundException {
         final String usdCurrencyCode = "USD";
         CurrencyEntity dollar = currencyDao.getEntityBy(usdCurrencyCode);
-        try {
-            return convertDirectCrossRate(amount, base, target, dollar);
-        } catch (EntityNotFoundException ignored) {
-
-        }
-
-        try {
-            return convertReverseCrossRate(amount, base, target, dollar);
-        } catch (EntityNotFoundException ignored) {
-
+        Optional<ConvertedExchangeRateDto> optionalConvertedExchangeRateDto = convertDirectCrossRate(amount, base, target, dollar);
+        if (optionalConvertedExchangeRateDto.isEmpty()) {
+            ConvertedExchangeRateDto convertedReverseCrossRate = convertReverseCrossRate(amount, base, target, dollar);// TODO convert to Optional
+            if (convertedReverseCrossRate != null) {
+                return convertedReverseCrossRate;
+            }
         }
 
         return convertCrossRateIfDollarInSameQuotations(amount, base, target, dollar);
     }
 
-    private ConvertedExchangeRateDto convertCrossRateIfDollarInSameQuotations(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) throws EntityNotFoundException {
+    private ConvertedExchangeRateDto convertCrossRateIfDollarInSameQuotations(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar)
+            throws EntityNotFoundException {
         double convertedRate;
         try {
             convertedRate = calculateAndGetCrossRateIfDollarInTargets(amount, base, target, dollar);
@@ -111,13 +112,21 @@ public class ExchangeRateService {
         return new ConvertedExchangeRateDto(base, target, convertedRate, amount, convertedRate * amount);
     }
 
-    private ConvertedExchangeRateDto convertDirectCrossRate(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) throws EntityNotFoundException {
-        ConvertedExchangeRateDto fromBaseToDollar = convertAtDirectRate(amount, base, dollar);
-        ConvertedExchangeRateDto fromDollarToTarget = convertAtDirectRate(fromBaseToDollar.convertedAmount(), dollar, target);
-        return new ConvertedExchangeRateDto(base, target, fromBaseToDollar.rate() * fromDollarToTarget.rate(), amount, fromDollarToTarget.convertedAmount());
+    private Optional<ConvertedExchangeRateDto> convertDirectCrossRate(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) {
+        ConvertedExchangeRateDto fromBaseToDollar = null;
+        ConvertedExchangeRateDto fromDollarToTarget = null;
+        try {
+            fromBaseToDollar = convertAtDirectRate(amount, base, dollar);
+            fromDollarToTarget = convertAtDirectRate(fromBaseToDollar.convertedAmount(), dollar, target);
+        } catch (EntityNotFoundException e) {
+            return Optional.empty();
+        }
+        ConvertedExchangeRateDto convertedExchangeRateDto = new ConvertedExchangeRateDto(base, target, fromBaseToDollar.rate() * fromDollarToTarget.rate(), amount, fromDollarToTarget.convertedAmount());
+        return Optional.of(convertedExchangeRateDto);
     }
 
-    private ConvertedExchangeRateDto convertReverseCrossRate(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) throws EntityNotFoundException {
+    private ConvertedExchangeRateDto convertReverseCrossRate(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar)
+            throws EntityNotFoundException {
         ConvertedExchangeRateDto fromTargetToDollar = convertAtReverseRate(amount, new CurrencyPairEntity(target, dollar));
         ConvertedExchangeRateDto fromDollarToBase = convertAtReverseRate(fromTargetToDollar.convertedAmount(), new CurrencyPairEntity(dollar, base));
         return new ConvertedExchangeRateDto(base, target, fromTargetToDollar.rate() * fromDollarToBase.rate(),
@@ -126,13 +135,15 @@ public class ExchangeRateService {
         );
     }
 
-    private double calculateAndGetCrossRateIfDollarInTargets(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) throws EntityNotFoundException {
+    private double calculateAndGetCrossRateIfDollarInTargets(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar)
+            throws EntityNotFoundException {
         ConvertedExchangeRateDto fromBaseToDollar = convertAtDirectRate(amount, base, dollar);
         ConvertedExchangeRateDto fromTargetToDollar = convertAtDirectRate(amount, target, dollar);
         return fromBaseToDollar.convertedAmount() / fromTargetToDollar.convertedAmount();
     }
 
-    private double calculateAndGetCrossRateIfDollarInBases(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar) throws EntityNotFoundException {
+    private double calculateAndGetCrossRateIfDollarInBases(double amount, CurrencyEntity base, CurrencyEntity target, CurrencyEntity dollar)
+            throws EntityNotFoundException {
         ConvertedExchangeRateDto fromDollarToBase = convertAtDirectRate(amount, dollar, base);
         ConvertedExchangeRateDto fromDollarToTarget = convertAtDirectRate(amount, dollar, target);
         return fromDollarToTarget.convertedAmount() / fromDollarToBase.convertedAmount();
