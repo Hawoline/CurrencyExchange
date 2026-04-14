@@ -16,7 +16,11 @@ public class CurrencyMapper {
     }
 
     public CurrencyEntity getCurrencyEntityFrom(Currency currency) {
-        return new CurrencyEntity(currency.getDisplayName(Locale.ENGLISH), currency.getCurrencyCode(), currency.getSymbol());
+        return new CurrencyEntity(
+                currency.getDisplayName(Locale.ENGLISH),
+                currency.getCurrencyCode(),
+                currency.getSymbol()
+        );
     }
 
     public Currency fromEntityToModel(CurrencyEntity currencyEntity) {
