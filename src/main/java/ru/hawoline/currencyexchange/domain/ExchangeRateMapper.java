@@ -18,10 +18,13 @@ public class ExchangeRateMapper {
         );
     }
 
-    public ConvertedExchangeRateDto toConvertedExchangeRateDto(double amount, ConvertedExchangeRate convertedExchangeRate) {
+    public ConvertedExchangeRateDto toConvertedExchangeRateDto(ConvertedExchangeRate convertedExchangeRate,
+                                                               CurrencyEntity base,
+                                                               CurrencyEntity target,
+                                                               double amount) {
         return new ConvertedExchangeRateDto(
-                currencyMapper.getCurrencyEntityFrom(convertedExchangeRate.base()),
-                currencyMapper.getCurrencyEntityFrom(convertedExchangeRate.target()),
+                base,
+                target,
                 convertedExchangeRate.rate(),
                 amount,
                 convertedExchangeRate.targetAmount()

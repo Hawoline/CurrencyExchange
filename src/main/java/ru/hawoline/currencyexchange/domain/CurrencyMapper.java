@@ -17,6 +17,7 @@ public class CurrencyMapper {
 
     public CurrencyEntity getCurrencyEntityFrom(Currency currency) {
         return new CurrencyEntity(
+                0,
                 currency.getDisplayName(Locale.ENGLISH),
                 currency.getCurrencyCode(),
                 currency.getSymbol()
