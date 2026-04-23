@@ -35,7 +35,7 @@ sign = A
 
 ###
 # @name getAllExchangeRates
-GET http://localhost:8080/exchangeRates
+GET http://185.242.107.137:8080/CurrencyExchange-1.0-SNAPSHOT/exchangeRates
 
 ###
 # @name addExchangeRate

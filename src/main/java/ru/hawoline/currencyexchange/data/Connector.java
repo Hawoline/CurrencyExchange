@@ -6,11 +6,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Connector {
-    private static final String URL = "jdbc:sqlite:C:" + File.separator +
-            "Users" + File.separator +
-            "Hawoline" + File.separator +
-            "IdeaProjects" + File.separator +
-            "CurrencyExchange" + File.separator +
+    private static final String URL = "jdbc:sqlite:" + File.separator +
+            "opt" + File.separator +
+            "currency_exchange" + File.separator +
+            "data" + File.separator +
             "currency_exchange.sqlite";
     private static final Connection connection;
 
